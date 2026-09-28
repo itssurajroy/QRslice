@@ -186,6 +186,7 @@ export default function OnboardingPage() {
   const [ownerEmail, setOwnerEmail] = useState("");
   const [ownerPassword, setOwnerPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [ageVerified, setAgeVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -250,6 +251,7 @@ export default function OnboardingPage() {
           ownerName: ownerName.trim(),
           ownerEmail: ownerEmail.trim(),
           ownerPassword,
+          ageVerified,
         }),
       });
 
@@ -1082,6 +1084,20 @@ export default function OnboardingPage() {
                     <span>{error}</span>
                   </div>
                 )}
+                
+                <div className="flex items-start gap-2.5 pt-2">
+                  <input
+                    type="checkbox"
+                    id="ageVerified"
+                    required
+                    checked={ageVerified}
+                    onChange={(e) => setAgeVerified(e.target.checked)}
+                    className="mt-1 w-4 h-4 rounded border-slate-300 text-[#5738F5] focus:ring-[#5738F5]/20 cursor-pointer"
+                  />
+                  <label htmlFor="ageVerified" className="text-xs text-slate-600 leading-snug cursor-pointer">
+                    I confirm that I am at least 13 years of age, and I agree to the <Link href="/legal/terms" className="text-[#5738F5] font-bold hover:underline">Terms of Service</Link> and <Link href="/legal/privacy" className="text-[#5738F5] font-bold hover:underline">Privacy Policy</Link>.
+                  </label>
+                </div>
               </div>
 
               <div className="flex gap-3 pt-2">
@@ -1094,7 +1110,7 @@ export default function OnboardingPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !ageVerified}
                   className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-[#5738F5] to-[#7C3AED] hover:opacity-95 text-white font-black text-xs sm:text-sm transition-all shadow-lg shadow-violet-500/25 cursor-pointer disabled:opacity-50 active:scale-[0.99] flex items-center justify-center gap-2"
                 >
                   <SparklesIcon className="w-4 h-4 text-amber-300" />

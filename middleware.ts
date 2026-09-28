@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
   // images.unsplash.com serves menu/dish photography (seed data + fallbacks).
   response.headers.set(
     "content-security-policy",
-    "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com data: blob:; " +
+    "default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co data: blob:; " +
       "img-src 'self' https://*.supabase.co https://images.unsplash.com data: blob:;"
   );
 

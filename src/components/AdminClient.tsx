@@ -425,6 +425,8 @@ export default function AdminClient({
         const fileExt = newItemImageFile.name.split('.').pop();
         const fileName = `${restaurantId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
         
+        // TODO: Register a DMCA Designated Agent with the U.S. Copyright Office ($6 fee) to limit statutory damages.
+        // Ensure upload flows reference copyright policies.
         const { error: uploadError } = await supabase.storage
           .from("images")
           .upload(fileName, newItemImageFile);
@@ -1400,6 +1402,7 @@ export default function AdminClient({
                   }}
                   className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-brand file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-brand-lavender file:text-brand hover:file:bg-brand-lavender"
                 />
+                <p className="text-[10px] text-slate-400 mt-1">By uploading, you confirm you own the copyright to this image per our DMCA policy.</p>
               </div>
 
               <label className="flex items-center gap-2 text-xs text-slate-600 font-semibold cursor-pointer pt-1">

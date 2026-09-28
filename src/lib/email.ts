@@ -21,7 +21,7 @@ const SUBJECTS: Record<TrialEmailDay, string> = {
 function template(day: TrialEmailDay, ctx: TrialEmailContext): string {
   const head = `<h1 style="font-family:sans-serif;color:#0f172a;">${ctx.cafeName} × QRslice</h1>`;
   const cta = `<a href="${ctx.billingUrl}" style="display:inline-block;background:#4f46e5;color:#fff;padding:12px 24px;border-radius:12px;text-decoration:none;font-weight:bold;">${day === 14 ? "Restore full access" : "Upgrade now"}</a>`;
-  const foot = `<p style="color:#64748b;font-size:12px;">QRslice · ₹999/month per outlet · GST extra · Cancel anytime</p>`;
+  const foot = `<p style="color:#64748b;font-size:12px;">QRslice · ₹999/month per outlet · GST extra · Cancel anytime<br><br>123 QRslice Blvd, Tech District, 94107<br><a href="https://qrslice.com/unsubscribe" style="color:#64748b;">Unsubscribe</a></p>`;
 
   switch (day) {
     case 0:

@@ -35,6 +35,7 @@ const onboardingSchema = z.object({
       veg: z.boolean().default(true),
     })
     .optional(),
+  ageVerified: z.boolean().refine(val => val === true, "Age verification is required"),
 });
 
 type PresetCategory = {

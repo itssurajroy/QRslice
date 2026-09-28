@@ -32,7 +32,6 @@ type SettingsCategory =
   | "qr"
   | "printers"
   | "notifications"
-  | "wa-link"
   | "loyalty";
 
 export function SettingsTab(props: SettingsTabProps) {
@@ -200,6 +199,8 @@ export function SettingsTab(props: SettingsTabProps) {
       const ext = file.name.split(".").pop();
       const fileName = `${props.restaurant.id}_upi_qr_${Date.now()}.${ext}`;
 
+      // TODO: Register a DMCA Designated Agent with the U.S. Copyright Office ($6 fee) to limit statutory damages.
+      // Ensure upload flows reference copyright policies.
       const { error } = await supabase.storage
         .from("images")
         .upload(`qr/${fileName}`, file, { cacheControl: "3600", upsert: true });
@@ -708,6 +709,7 @@ export function SettingsTab(props: SettingsTabProps) {
                       disabled={uploadingImage}
                       className="w-full bg-[#F8F7FC] border border-[#E7E4F0] rounded-xl px-3 py-2 text-xs font-bold text-[#6F7185] cursor-pointer"
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">By uploading, you confirm you own the copyright to this image per our DMCA policy.</p>
                   </div>
                 </div>
 
