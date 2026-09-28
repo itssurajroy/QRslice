@@ -121,12 +121,22 @@ export function ProvisionTenantModal() {
           </div>
 
           <div className="p-3.5 rounded-xl bg-violet-50/50 border border-violet-100 space-y-1">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-extrabold text-slate-900">All-in-One Pro Plan</span>
-              <span className="text-[#5738F5] font-mono font-bold text-xs">₹999/mo (14d Free Trial)</span>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-extrabold text-slate-900">Subscription Tier</span>
+              <select
+                value={ctx.newCafeTier}
+                onChange={(e) => ctx.setNewCafeTier(e.target.value as "starter" | "pro" | "enterprise")}
+                className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-[#5738F5]/50"
+              >
+                <option value="starter">Starter</option>
+                <option value="pro">Pro</option>
+                <option value="enterprise">Enterprise</option>
+              </select>
             </div>
             <span className="text-[11px] text-slate-500 block">
-              Contactless QR Menu, Kitchen OS, Billing, Staff POS, Inventory
+              {ctx.newCafeTier === "starter" && "Basic Menu, 10 Tables, POS"}
+              {ctx.newCafeTier === "pro" && "Unlimited Tables, Advanced Analytics, KDS, Custom Branding"}
+              {ctx.newCafeTier === "enterprise" && "Everything + CRM, Loyalty, Multi-Location"}
             </span>
           </div>
 

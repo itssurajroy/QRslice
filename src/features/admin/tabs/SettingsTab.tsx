@@ -3,21 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { renderWhatsAppMessage, DEFAULT_WA_TEMPLATE } from "@/lib/whatsapp-templates";
-import {
-  GearIcon,
-  PaletteIcon,
-  ClockIcon,
-  CreditCardIcon,
-  QrCodeIcon,
-  PrinterIcon,
-  BellIcon,
-  MessageCircleIcon,
-  SparklesIcon,
-  CheckCircleIcon,
-  CheckIcon,
-  RefreshCwIcon,
-} from "@/components/Icons";
+import { GearIcon, PaletteIcon, ClockIcon, CreditCardIcon, QrCodeIcon, PrinterIcon, BellIcon, MessageCircleIcon, SparklesIcon, CheckCircleIcon, CheckIcon, RefreshCwIcon } from "@/components/Icons";
 
 interface SettingsTabProps {
   restaurant: { id: string; name?: string; slug?: string; gstin?: string; fssai?: string; address?: string; phone?: string; email?: string };
@@ -46,7 +32,6 @@ type SettingsCategory =
   | "qr"
   | "printers"
   | "notifications"
-  | "whatsapp"
   | "loyalty";
 
 export function SettingsTab(props: SettingsTabProps) {
@@ -112,24 +97,7 @@ export function SettingsTab(props: SettingsTabProps) {
   const [emailAlerts, setEmailAlerts] = useState(true);
   const [orderReadySms, setOrderReadySms] = useState(false);
 
-  // WhatsApp Bill Settings State
-  const [waEnabled, setWaEnabled] = useState(true);
-  const [waTemplate, setWaTemplate] = useState(DEFAULT_WA_TEMPLATE);
-  const [waIncludeReviewCta, setWaIncludeReviewCta] = useState(true);
-  const [waIncludeGstin, setWaIncludeGstin] = useState(true);
-  const [waThankYou, setWaThankYou] = useState("Thank you for dining with us! ❤️");
-  const [savingWa, setSavingWa] = useState(false);
-  const [autoSendWaBill, setAutoSendWaBill] = useState(true);
-  const [includePdfInvoice, setIncludePdfInvoice] = useState(true);
-  const [includeOrderAgainBtn, setIncludeOrderAgainBtn] = useState(true);
 
-  // WhatsApp Baileys link state
-  const [waLinked, setWaLinked] = useState(false);
-  const [waConnected, setWaConnected] = useState(false);
-  const [waPhoneNumber, setWaPhoneNumber] = useState<string | null>(null);
-  const [waQr, setWaQr] = useState<string | null>(null);
-  const [waLinking, setWaLinking] = useState(false);
-  const [testingWaSend, setTestingWaSend] = useState(false);
 
   useEffect(() => {
     async function loadSettings() {
@@ -165,26 +133,6 @@ export function SettingsTab(props: SettingsTabProps) {
           if (data.soundAlerts !== undefined) setSoundAlerts(data.soundAlerts);
           if (data.emailAlerts !== undefined) setEmailAlerts(data.emailAlerts);
           if (data.orderReadySms !== undefined) setOrderReadySms(data.orderReadySms);
-          
-          if (data.waTemplate) setWaTemplate(data.waTemplate);
-          if (data.waEnabled !== undefined) setWaEnabled(data.waEnabled);
-          if (data.waIncludeReviewCta !== undefined) setWaIncludeReviewCta(data.waIncludeReviewCta);
-          if (data.waIncludeGstin !== undefined) setWaIncludeGstin(data.waIncludeGstin);
-          if (data.waThankYou) setWaThankYou(data.waThankYou);
-          if (data.autoSendWaBill !== undefined) setAutoSendWaBill(data.autoSendWaBill);
-          if (data.includePdfInvoice !== undefined) setIncludePdfInvoice(data.includePdfInvoice);
-          if (data.includeOrderAgainBtn !== undefined) setIncludeOrderAgainBtn(data.includeOrderAgainBtn);
-        }
-      } catch {
-        // ignore
-      }
-      try {
-        const s = await fetch("/api/whatsapp/status");
-        if (s.ok) {
-          const d = await s.json();
-          setWaLinked(!!d.linked);
-          setWaConnected(!!d.connected);
-          if (d.phoneNumber) setWaPhoneNumber(d.phoneNumber);
         }
       } catch {
         // ignore
@@ -192,117 +140,6 @@ export function SettingsTab(props: SettingsTabProps) {
     }
     loadSettings();
   }, []);
-
-  async function handleSaveWaSettings(e: React.FormEvent) {
-    e.preventDefault();
-    setSavingWa(true);
-    try {
-      const res = await fetch("/api/admin/whatsapp/settings", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          enabled: waEnabled,
-          message_template: waTemplate,
-          include_review_cta: waIncludeReviewCta,
-          include_gstin_line: waIncludeGstin,
-          thank_you_line: waThankYou,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to update WhatsApp settings");
-      props.flash("ok", "WhatsApp Bill template & automation rules updated! 💬");
-    } catch (err: unknown) {
-      props.flash("err", err instanceof Error ? err.message : "Failed to save WhatsApp settings");
-    } finally {
-      setSavingWa(false);
-    }
-  }
-
-  async function handleLinkWhatsApp() {
-    setWaLinking(true);
-    setWaQr(null);
-    try {
-      const res = await fetch("/api/whatsapp/qr");
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to get QR");
-      if (data.connected) {
-        setWaLinked(true);
-        setWaConnected(true);
-        props.flash("ok", "WhatsApp already linked ✓");
-        return;
-      }
-      if (data.qr) {
-        setWaQr(data.qr);
-        // Poll status every 2s up to 60s
-        let tries = 0;
-        const iv = setInterval(async () => {
-          tries++;
-          try {
-            const s = await fetch("/api/whatsapp/status");
-            const d = await s.json();
-            if (d.linked && d.connected) {
-              clearInterval(iv);
-              setWaLinked(true);
-              setWaConnected(true);
-              setWaPhoneNumber(d.phoneNumber || null);
-              setWaQr(null);
-              props.flash("ok", "WhatsApp linked successfully ✓");
-            }
-          } catch {}
-          if (tries >= 30) {
-            clearInterval(iv);
-            setWaLinking(false);
-          }
-        }, 2000);
-      }
-    } catch (err: unknown) {
-      props.flash("err", err instanceof Error ? err.message : "Failed to link WhatsApp");
-      setWaLinking(false);
-    }
-  }
-
-  async function handleDisconnectWhatsApp() {
-    try {
-      const res = await fetch("/api/whatsapp/disconnect", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to disconnect");
-      setWaLinked(false);
-      setWaConnected(false);
-      setWaPhoneNumber(null);
-      setWaQr(null);
-      props.flash("ok", "WhatsApp disconnected");
-    } catch (err: unknown) {
-      props.flash("err", err instanceof Error ? err.message : "Failed to disconnect");
-    } finally {
-      setWaLinking(false);
-    }
-  }
-
-  async function handleTestWaSend() {
-    if (!waLinked) {
-      props.flash("err", "Link WhatsApp number in Settings first");
-      return;
-    }
-    setTestingWaSend(true);
-    try {
-      const res = await fetch("/api/whatsapp/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          phone: props.restaurant?.phone || "919876543210", // fallback test number
-          template_name: "bill_receipt",
-          template_language: "en",
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Test send failed");
-      props.flash("ok", `Test WhatsApp sent successfully! Message ID: ${data.messageId}`);
-    } catch (err: any) {
-      props.flash("err", err.message || "Test send failed");
-    } finally {
-      setTestingWaSend(false);
-    }
-  }
 
   async function handleSaveSettings(e: React.FormEvent) {
     e.preventDefault();
@@ -337,7 +174,7 @@ export function SettingsTab(props: SettingsTabProps) {
           qrType, afterScanAction, allowCustomerOrdering, requireTableSelection, showQrBranding,
           printers,
           soundAlerts, emailAlerts, orderReadySms,
-          waEnabled, waTemplate, waIncludeReviewCta, waIncludeGstin, waThankYou, autoSendWaBill, includePdfInvoice, includeOrderAgainBtn
+          waEnabled: false, waTemplate: "", waIncludeReviewCta: true, waIncludeGstin: true, waThankYou: "", autoSendWaBill: true, includePdfInvoice: true, includeOrderAgainBtn: true
         }),
       });
       if (!settingsRes.ok) {
@@ -362,6 +199,8 @@ export function SettingsTab(props: SettingsTabProps) {
       const ext = file.name.split(".").pop();
       const fileName = `${props.restaurant.id}_upi_qr_${Date.now()}.${ext}`;
 
+      // TODO: Register a DMCA Designated Agent with the U.S. Copyright Office ($6 fee) to limit statutory damages.
+      // Ensure upload flows reference copyright policies.
       const { error } = await supabase.storage
         .from("images")
         .upload(`qr/${fileName}`, file, { cacheControl: "3600", upsert: true });
@@ -399,7 +238,6 @@ export function SettingsTab(props: SettingsTabProps) {
     receiptUrl: "https://qrslice.com/receipt/sample-token",
   };
 
-  const renderedPreview = renderWhatsAppMessage(waTemplate, samplePreviewVars, true);
 
   const categories: Array<{ id: SettingsCategory; label: string; icon: any }> = [
     { id: "restaurant", label: "Restaurant Info", icon: GearIcon },
@@ -410,7 +248,6 @@ export function SettingsTab(props: SettingsTabProps) {
     { id: "qr", label: "Tables & QR", icon: QrCodeIcon },
     { id: "printers", label: "Printers", icon: PrinterIcon },
     { id: "notifications", label: "Notifications", icon: BellIcon },
-    { id: "whatsapp", label: "WhatsApp Receipts", icon: MessageCircleIcon },
     { id: "loyalty", label: "CRM & Loyalty", icon: SparklesIcon },
   ];
 
@@ -424,7 +261,7 @@ export function SettingsTab(props: SettingsTabProps) {
               ⚙️
             </span>
             <h2 className="text-xl sm:text-2xl font-black text-[#17142B] tracking-tight">
-              Restaurant Configuration &amp; Governance
+              Restaurant Configuration & Governance
             </h2>
           </div>
           <p className="text-xs text-[#6F7185] mt-1 font-medium">
@@ -480,7 +317,7 @@ export function SettingsTab(props: SettingsTabProps) {
             <div className="space-y-6">
               <div className="border-b border-[#E7E4F0] pb-4">
                 <h3 className="text-sm font-black text-[#17142B] uppercase tracking-wider">
-                  Restaurant Identity &amp; Legal Info
+                  Restaurant Identity & Legal Info
                 </h3>
                 <p className="text-xs text-[#6F7185]">
                   Appears on official invoices, customer QR menus, and tax receipts.
@@ -566,7 +403,7 @@ export function SettingsTab(props: SettingsTabProps) {
 
               <div>
                 <label className="font-bold text-[#17142B] uppercase tracking-wider block mb-1 text-xs">
-                  Physical Address (Printed on Invoices &amp; Bills)
+                  Physical Address (Printed on Invoices & Bills)
                 </label>
                 <textarea
                   rows={2}
@@ -609,7 +446,7 @@ export function SettingsTab(props: SettingsTabProps) {
             <div className="space-y-6">
               <div className="border-b border-[#E7E4F0] pb-4">
                 <h3 className="text-sm font-black text-[#17142B] uppercase tracking-wider">
-                  Menu &amp; Receipt Branding
+                  Menu & Receipt Branding
                 </h3>
                 <p className="text-xs text-[#6F7185]">
                   Color scheme, customer-facing tagline, and Google review link.
@@ -743,7 +580,7 @@ export function SettingsTab(props: SettingsTabProps) {
             <div className="space-y-6">
               <div className="border-b border-[#E7E4F0] pb-4">
                 <h3 className="text-sm font-black text-[#17142B] uppercase tracking-wider">
-                  Configurable GST &amp; Service Charges
+                  Configurable GST & Service Charges
                 </h3>
                 <p className="text-xs text-[#6F7185]">
                   Dynamic tax splits applied to bills, KOTs, and POS settlements.
@@ -764,7 +601,7 @@ export function SettingsTab(props: SettingsTabProps) {
                     }}
                     className="w-full px-3 py-2 bg-white border border-[#E7E4F0] rounded-xl font-mono font-bold text-[#17142B]"
                   />
-                  <span className="text-[10px] text-[#6F7185]">Central Goods &amp; Service Tax</span>
+                  <span className="text-[10px] text-[#6F7185]">Central Goods & Service Tax</span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[#F8F7FC] border border-[#E7E4F0] space-y-1">
@@ -780,7 +617,7 @@ export function SettingsTab(props: SettingsTabProps) {
                     }}
                     className="w-full px-3 py-2 bg-white border border-[#E7E4F0] rounded-xl font-mono font-bold text-[#17142B]"
                   />
-                  <span className="text-[10px] text-[#6F7185]">State Goods &amp; Service Tax</span>
+                  <span className="text-[10px] text-[#6F7185]">State Goods & Service Tax</span>
                 </div>
 
                 <div className="p-4 rounded-2xl bg-[#F8F7FC] border border-[#E7E4F0] space-y-1">
@@ -829,7 +666,7 @@ export function SettingsTab(props: SettingsTabProps) {
             <div className="space-y-6">
               <div className="border-b border-[#E7E4F0] pb-4">
                 <h3 className="text-sm font-black text-[#17142B] uppercase tracking-wider">
-                  Direct-to-Bank UPI &amp; Tender Methods
+                  Direct-to-Bank UPI & Tender Methods
                 </h3>
                 <p className="text-xs text-[#6F7185]">
                   0% Commission direct payments to your merchant bank account.
@@ -872,6 +709,7 @@ export function SettingsTab(props: SettingsTabProps) {
                       disabled={uploadingImage}
                       className="w-full bg-[#F8F7FC] border border-[#E7E4F0] rounded-xl px-3 py-2 text-xs font-bold text-[#6F7185] cursor-pointer"
                     />
+                    <p className="text-[10px] text-slate-400 mt-1">By uploading, you confirm you own the copyright to this image per our DMCA policy.</p>
                   </div>
                 </div>
 
@@ -920,7 +758,7 @@ export function SettingsTab(props: SettingsTabProps) {
             <div className="space-y-6">
               <div className="border-b border-[#E7E4F0] pb-4">
                 <h3 className="text-sm font-black text-[#17142B] uppercase tracking-wider">
-                  QR Code Behavior &amp; Table Ordering
+                  QR Code Behavior & Table Ordering
                 </h3>
                 <p className="text-xs text-[#6F7185]">
                   Configure what happens when a guest scans the acrylic stand on their table.
@@ -1012,7 +850,7 @@ export function SettingsTab(props: SettingsTabProps) {
               <div className="flex items-center justify-between border-b border-[#E7E4F0] pb-4">
                 <div>
                   <h3 className="text-sm font-black text-[#17142B] uppercase tracking-wider">
-                    Thermal KOT &amp; Bill Printers
+                    Thermal KOT & Bill Printers
                   </h3>
                   <p className="text-xs text-[#6F7185]">
                     ESC/POS network and USB printers for kitchen tickets and counter bills.
@@ -1068,7 +906,7 @@ export function SettingsTab(props: SettingsTabProps) {
             <div className="space-y-6">
               <div className="border-b border-[#E7E4F0] pb-4">
                 <h3 className="text-sm font-black text-[#17142B] uppercase tracking-wider">
-                  Audio Alerts &amp; Staff Notifications
+                  Audio Alerts & Staff Notifications
                 </h3>
                 <p className="text-xs text-[#6F7185]">
                   Keep kitchen staff and cashiers alerted on new orders.
@@ -1118,185 +956,14 @@ export function SettingsTab(props: SettingsTabProps) {
             </div>
           )}
 
-          {/* 9. WHATSAPP RECEIPTS */}
-          {activeCategory === "whatsapp" && (
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E7E4F0] pb-4">
-                <div>
-                  <h3 className="text-sm font-black text-[#17142B] uppercase tracking-wider">
-                    WhatsApp Digital Bill &amp; Receipt Automation
-                  </h3>
-                  <p className="text-xs text-[#6F7185]">
-                    Customize the message sent to diners on WhatsApp after payment.
-                  </p>
-                </div>
-                <label className="inline-flex items-center gap-2 cursor-pointer select-none">
-                  <span className="text-xs font-bold text-[#17142B]">WhatsApp Bills</span>
-                  <input
-                    type="checkbox"
-                    checked={waEnabled}
-                    onChange={(e) => setWaEnabled(e.target.checked)}
-                    className="w-5 h-5 accent-[#34C759] rounded"
-                  />
-                </label>
-              </div>
 
-              <form onSubmit={handleSaveWaSettings} className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="p-4 rounded-2xl bg-[#F8F7FC] border border-[#E7E4F0] space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-black text-[#17142B] uppercase tracking-wider">WhatsApp Connection</span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${waLinked ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
-                          {waLinked ? "● Linked" : "○ Not linked"}
-                        </span>
-                      </div>
-                      {waLinked && waPhoneNumber && (
-                        <p className="text-xs font-mono text-[#17142B]">Connected as {waPhoneNumber}</p>
-                      )}
-                      {waQr ? (
-                        <div className="space-y-2">
-                          <img src={waQr} alt="WhatsApp QR" className="w-48 h-48 mx-auto bg-white p-2 rounded-xl border" />
-                          <p className="text-[11px] text-center text-[#6F7185]">Waiting for scan…</p>
-                        </div>
-                      ) : waLinked ? (
-                        <button type="button" onClick={handleDisconnectWhatsApp} className="w-full px-4 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-bold text-xs rounded-xl border border-red-200 transition">
-                          Disconnect WhatsApp
-                        </button>
-                      ) : (
-                        <button type="button" onClick={handleLinkWhatsApp} disabled={waLinking} className="w-full px-4 py-2 bg-[#25D366] hover:bg-[#1DA851] text-white font-black text-xs rounded-xl transition disabled:opacity-50">
-                          {waLinking ? "Linking…" : "Link WhatsApp Number"}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-xs font-black text-[#17142B] uppercase tracking-wider mb-1.5">
-                        Message Template
-                      </label>
-                      <textarea
-                        rows={7}
-                        value={waTemplate}
-                        onChange={(e) => setWaTemplate(e.target.value)}
-                        className="w-full p-3.5 bg-[#F8F7FC] border border-[#E7E4F0] rounded-2xl text-xs font-mono text-[#17142B] focus:border-[#5738F5] leading-relaxed"
-                      />
-                    </div>
-
-                    {/* Tag Pills */}
-                    <div className="space-y-1.5">
-                      <span className="text-[10px] font-bold text-[#6F7185] uppercase tracking-wider block">
-                        Dynamic Variables:
-                      </span>
-                      <div className="flex flex-wrap gap-1.5 text-[11px]">
-                        {[
-                          { tag: "{restaurant.name}", desc: "Café Name" },
-                          { tag: "{orderNumber}", desc: "Order #" },
-                          { tag: "{tableNumber}", desc: "Table" },
-                          { tag: "{total}", desc: "Total ₹" },
-                          { tag: "{paymentModeLine}", desc: "Payment Mode" },
-                          { tag: "{receiptUrl}", desc: "Receipt Link" },
-                        ].map(({ tag }) => (
-                          <button
-                            key={tag}
-                            type="button"
-                            onClick={() => setWaTemplate((prev) => `${prev} ${tag}`)}
-                            className="px-2 py-0.5 bg-[#F1EFF7] hover:bg-[#5738F5] hover:text-white rounded-lg font-mono text-[10px] font-bold transition"
-                          >
-                            {tag}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 pt-2 text-xs">
-                      <label className="flex items-center gap-2 cursor-pointer font-bold text-[#17142B]">
-                        <input
-                          type="checkbox"
-                          checked={autoSendWaBill}
-                          onChange={(e) => setAutoSendWaBill(e.target.checked)}
-                          className="w-4 h-4 accent-[#34C759]"
-                        />
-                        <span>Automatically send bill after successful payment</span>
-                      </label>
-
-                      <label className="flex items-center gap-2 cursor-pointer font-bold text-[#17142B]">
-                        <input
-                          type="checkbox"
-                          checked={includePdfInvoice}
-                          onChange={(e) => setIncludePdfInvoice(e.target.checked)}
-                          className="w-4 h-4 accent-[#34C759]"
-                        />
-                        <span>Include PDF Tax Invoice link</span>
-                      </label>
-
-                      <label className="flex items-center gap-2 cursor-pointer font-bold text-[#17142B]">
-                        <input
-                          type="checkbox"
-                          checked={includeOrderAgainBtn}
-                          onChange={(e) => setIncludeOrderAgainBtn(e.target.checked)}
-                          className="w-4 h-4 accent-[#34C759]"
-                        />
-                        <span>Include &ldquo;Order Again&rdquo; deep link button</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Smartphone Preview */}
-                <div className="lg:col-span-2 bg-[#EFEAE2] border border-[#DDD6C9] rounded-3xl p-4 sm:p-5 shadow-inner space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#E0D8CB] text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-[#34C759] text-white flex items-center justify-center text-xs font-bold">
-                        💬
-                      </span>
-                      <div className="text-xs font-bold text-slate-900">
-                        {props.settingsCafeName || "Your Café"}
-                      </div>
-                    </div>
-                    <span className="text-[10px] bg-white/70 px-2 py-0.5 rounded text-slate-600 font-mono">
-                      WhatsApp
-                    </span>
-                  </div>
-
-                  <div className="bg-white rounded-2xl rounded-tl-xs p-3 shadow-xs text-xs font-sans text-slate-800 space-y-2 border border-black/[0.04]">
-                    <pre className="whitespace-pre-wrap font-sans text-xs text-slate-900 leading-relaxed">
-                      {renderedPreview}
-                    </pre>
-                    <div className="text-right text-[10px] text-slate-400 font-mono">
-                      Just now ✓✓
-                    </div>
-                  </div>
-                </div>
-
-                <div className="lg:col-span-2 pt-4 border-t border-[#E7E4F0] flex justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={handleTestWaSend}
-                    disabled={testingWaSend || !waLinked}
-                    className="px-5 py-2.5 bg-[#34C759]/10 hover:bg-[#34C759] text-[#34C759] hover:text-white font-black text-xs rounded-xl shadow-xs transition cursor-pointer disabled:opacity-50 flex items-center gap-2"
-                  >
-                    {testingWaSend ? "Sending Test…" : "🧪 Send Test WhatsApp"}
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={savingWa}
-                    className="px-5 py-2.5 bg-[#34C759] hover:bg-[#2EB84E] text-white font-black text-xs rounded-xl shadow-xs transition cursor-pointer disabled:opacity-50"
-                  >
-                    {savingWa ? "Saving Template…" : "Save WhatsApp Template ✓"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
 
           {/* 10. CRM & LOYALTY */}
           {activeCategory === "loyalty" && (
             <div className="space-y-6">
               <div className="border-b border-[#E7E4F0] pb-4">
                 <h3 className="text-sm font-black text-[#17142B] uppercase tracking-wider">
-                  Loyalty Points &amp; CRM Connection
+                  Loyalty Points & CRM Connection
                 </h3>
                 <p className="text-xs text-[#6F7185]">
                   Earning rules, loyalty tiers, and customer segment lifecycle.

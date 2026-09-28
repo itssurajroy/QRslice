@@ -1,6 +1,25 @@
 @import "tailwindcss";
 
 /* ============================================
+   TAILWIND V4 BRAND THEME TOKENS
+   ============================================ */
+@theme {
+  /* Brand Colors — from QRslice Brand Identity Sheet */
+  --color-brand: #5738F5;
+  --color-brand-dark: #4328D9;
+  --color-brand-ink: #17142B;
+  --color-brand-lavender: #EEEAFE;
+  --color-brand-surface: #F8F7FF;
+  --color-brand-success: #22C55E;
+  --color-brand-warning: #F59E0B;
+  --color-brand-error: #EF4444;
+
+  /* Font Family */
+  --font-sans: 'Plus Jakarta Sans', var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  --font-mono: 'DM Mono', var(--font-geist-mono), monospace;
+}
+
+/* ============================================
    QRSLICE DESIGN TOKENS
    ============================================ */
 :root {
@@ -10,11 +29,11 @@
   --ios-subtle: #E5E5EA;
   --ios-border: rgba(0, 0, 0, 0.06);
   --ios-blue: #007AFF;
-  --ios-indigo: #5856D6;
-  --ios-green: #34C759;
-  --ios-orange: #FF9500;
-  --ios-red: #FF3B30;
-  --ios-text-primary: #1C1C1E;
+  --ios-indigo: #5738F5;
+  --ios-green: #22C55E;
+  --ios-orange: #F59E0B;
+  --ios-red: #EF4444;
+  --ios-text-primary: #17142B;
   --ios-text-secondary: #8E8E93;
 
   /* Brand Colors */
@@ -28,11 +47,11 @@
 
   /* Legacy tokens (preserved for dashboard/admin) */
   --background: #F5F5F7;
-  --foreground: #1C1C1E;
+  --foreground: #17142B;
   --color-primary-hover: #4328D9;
   --accent: #5738F5;
   --accent-rgb: 87, 56, 245;
-  --accent-amber: #f59e0b;
+  --accent-amber: #F59E0B;
 
   /* Typography */
   --font-heading: 'Plus Jakarta Sans', var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
@@ -54,7 +73,7 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
   overscroll-behavior-y: none;
   user-select: none;
@@ -219,10 +238,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .skeleton {
-  background: linear-gradient(90deg, #1c1917 25%, #292524 50%, #1c1917 75%);
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 1.5s ease-in-out infinite;
   border-radius: 8px;
+}
+
+.dark .skeleton {
+  background: linear-gradient(90deg, #1c1917 25%, #2c2523 50%, #1c1917 75%);
+  background-size: 200% 100%;
 }
 
 @keyframes pulse-soft {

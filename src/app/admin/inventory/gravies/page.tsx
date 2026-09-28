@@ -9,7 +9,7 @@ function AdminHeader({ title }: { title: string }) {
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-xl font-bold text-indigo-600">
+          <Link href="/" className="text-xl font-bold text-brand">
             QRslice
           </Link>
           <span className="text-slate-300">/</span>
@@ -121,7 +121,7 @@ export default function GraviesPage() {
           <h1 className="text-2xl font-bold text-slate-900">Gravy & Recipe Management</h1>
           <p className="text-sm text-slate-500">Create gravy mixes and link them to menu items</p>
         </div>
-        <button onClick={() => setShowAddForm(true)} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">
+        <button onClick={() => setShowAddForm(true)} className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">
           Create Gravy Recipe
         </button>
       </div>
@@ -134,15 +134,15 @@ export default function GraviesPage() {
               <div>
                 <label className="block text-sm font-medium text-slate-700">Name</label>
                 <input type="text" required value={newGravy.name} onChange={e => setNewGravy({ ...newGravy, name: e.target.value })}
-                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="e.g., Butter Masala Gravy" />
+                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="e.g., Butter Masala Gravy" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700">Yield</label>
                 <div className="flex gap-2">
                   <input type="number" step="0.1" value={newGravy.yield_quantity} onChange={e => setNewGravy({ ...newGravy, yield_quantity: parseFloat(e.target.value) || 1 })}
-                    className="mt-1 block w-24 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                    className="mt-1 block w-24 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500" />
                   <select value={newGravy.yield_unit} onChange={e => setNewGravy({ ...newGravy, yield_unit: e.target.value })}
-                    className="mt-1 block rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                    className="mt-1 block rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500">
                     <option value="portion">Portions</option>
                     <option value="kg">Kg</option>
                     <option value="litre">Litres</option>
@@ -153,10 +153,10 @@ export default function GraviesPage() {
             <div>
               <label className="block text-sm font-medium text-slate-700">Instructions</label>
               <textarea rows={3} value={newGravy.instructions} onChange={e => setNewGravy({ ...newGravy, instructions: e.target.value })}
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Step-by-step preparation instructions..." />
+                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="Step-by-step preparation instructions..." />
             </div>
             <div className="flex gap-3">
-              <button type="submit" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Create</button>
+              <button type="submit" className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">Create</button>
               <button type="button" onClick={() => setShowAddForm(false)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
             </div>
           </form>
@@ -175,7 +175,7 @@ export default function GraviesPage() {
                 <h3 className="font-semibold text-slate-900">{gravy.name}</h3>
                 <p className="text-sm text-slate-500">{gravy.yield_quantity} {gravy.yield_unit} • ₹{gravy.cost_per_yield.toFixed(2)}/unit</p>
               </div>
-              <button onClick={() => setSelectedGravy(selectedGravy?.id === gravy.id ? null : gravy)} className="text-indigo-600 hover:text-indigo-900 text-sm font-medium">
+              <button onClick={() => setSelectedGravy(selectedGravy?.id === gravy.id ? null : gravy)} className="text-brand hover:text-indigo-900 text-sm font-medium">
                 {selectedGravy?.id === gravy.id ? "Close" : "Edit"}
               </button>
             </div>
@@ -210,7 +210,7 @@ export default function GraviesPage() {
                   </select>
                   <input type="number" step="0.01" required placeholder="Qty" value={newGravyIngredient.quantity || ""} onChange={e => setNewGravyIngredient({ ...newGravyIngredient, quantity: parseFloat(e.target.value) || 0 })}
                     className="w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm" />
-                  <button type="submit" className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-indigo-700">Add</button>
+                  <button type="submit" className="rounded-lg bg-brand px-3 py-1.5 text-sm font-semibold text-white hover:bg-brand-dark">Add</button>
                 </form>
                 {gravy.gravy_ingredients?.length ? (
                   <div className="mt-2 space-y-1">

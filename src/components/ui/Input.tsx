@@ -42,7 +42,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className={`
               w-full bg-white border rounded-xl px-3 py-2.5 text-xs text-slate-900
               placeholder-slate-400 transition-colors outline-none
-              focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30
+              focus:border-brand focus:ring-1 focus:ring-brand-500/30
               disabled:opacity-50 disabled:cursor-not-allowed
               ${error ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" : "border-slate-300"}
               ${leftIcon ? "pl-9" : ""}
@@ -102,7 +102,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           className={`
             w-full bg-white border rounded-xl px-3 py-2.5 text-xs text-slate-900
             placeholder-slate-400 transition-colors outline-none resize-none
-            focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30
+            focus:border-brand focus:ring-1 focus:ring-brand-500/30
             disabled:opacity-50
             ${error ? "border-red-500" : "border-slate-300"}
             ${className}

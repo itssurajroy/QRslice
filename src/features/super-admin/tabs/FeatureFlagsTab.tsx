@@ -242,10 +242,11 @@ export function FeatureFlagsTab() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-3 border-t border-slate-100 items-center">
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
-                    <span>Traffic Allocation</span>
+                    <label htmlFor={`traffic-${flag.id}`}>Traffic Allocation</label>
                     <span className="font-mono font-bold text-slate-900">{flag.percentage}%</span>
                   </div>
                   <input
+                    id={`traffic-${flag.id}`}
                     type="range"
                     min="0"
                     max="100"
@@ -322,10 +323,11 @@ export function FeatureFlagsTab() {
 
               <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200/80 rounded-xl">
                 <div>
-                  <div className="text-xs font-bold text-slate-800">Initial Traffic Allocation</div>
+                  <label htmlFor="new-traffic" className="text-xs font-bold text-slate-800">Initial Traffic Allocation</label>
                   <div className="text-[11px] font-mono text-slate-500">{newRolloutPct}%</div>
                 </div>
                 <input
+                  id="new-traffic"
                   type="range"
                   min="0"
                   max="100"

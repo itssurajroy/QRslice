@@ -37,11 +37,11 @@ export function MenuItemCard({
       style={{ animationDelay: `${idx * 25}ms`, animationFillMode: "both" }}
       onClick={() => onAdd(item)}
     >
-      {/* Featured Pill */}
-      {isFeatured && (
+      {/* Featured / Bestseller Pill */}
+      {(item.is_bestseller || isFeatured) && (
         <div className="absolute -top-2.5 left-5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-[#5738F5] text-white text-[10px] font-black uppercase tracking-wider shadow-md shadow-violet-500/20 z-10 flex items-center gap-1">
           <SparklesIcon className="w-3 h-3" />
-          <span>Chef's Pick</span>
+          <span>{item.is_bestseller ? "👑 Bestseller" : "Chef's Pick"}</span>
         </div>
       )}
 
@@ -74,6 +74,20 @@ export function MenuItemCard({
             <ClockIcon className="w-2.5 h-2.5 text-slate-400" />
             <span>{getPrepTime(item.name)}</span>
           </span>
+
+          {/* Spice Index */}
+          {(item.spice_index ?? 0) > 0 && (
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200">
+              {"🌶️".repeat(item.spice_index || 0)}
+            </span>
+          )}
+
+          {/* Dynamic Tags */}
+          {(item.tags || []).map(tag => (
+            <span key={tag} className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-violet-50 text-violet-700 border border-violet-200 uppercase tracking-wider">
+              {tag}
+            </span>
+          ))}
         </div>
 
         {/* Dish Title */}

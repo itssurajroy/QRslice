@@ -140,43 +140,36 @@ export async function POST(req: NextRequest) {
   }
   const byId = new Map(menuItems.map((m) => [m.id, m]));
 
-  // Fetch verified modifier groups from platform_config for this restaurant
-  const { data: modConfig } = await db
-    .from("platform_config")
-    .select("value")
-    .eq("restaurant_id", table.restaurant_id)
-    .eq("key", "modifier_groups")
-    .maybeSingle();
+  // Fetch verified modifier options from database
+  const { data: dbOptions } = await db
+    .from("modifier_options")
+    .select("name, price_delta_paise, modifier_groups!inner(restaurant_id)")
+    .eq("modifier_groups.restaurant_id", table.restaurant_id)
+    .eq("active", true);
 
   const verifiedModifierPriceMap = new Map<string, number>();
-  const rawGroups = modConfig?.value || [
-    {
-      options: [
-        { name: "Regular", price_adjustment_paise: 0 },
-        { name: "Large", price_adjustment_paise: 6000 },
-        { name: "Jumbo / Family Pack", price_adjustment_paise: 12000 },
-        { name: "Mild", price_adjustment_paise: 0 },
-        { name: "Medium", price_adjustment_paise: 0 },
-        { name: "Spicy / Desi Hot", price_adjustment_paise: 0 },
-        { name: "Extra Mozzarella Cheese", price_adjustment_paise: 4000 },
-        { name: "Extra Makhani Gravy", price_adjustment_paise: 5000 },
-        { name: "Garlic Mint Mayo Dip", price_adjustment_paise: 2500 },
-      ],
-    },
-  ];
+  if (dbOptions) {
+    for (const opt of dbOptions) {
+      verifiedModifierPriceMap.set(
+        opt.name.trim().toLowerCase(),
+        Number(opt.price_delta_paise) || 0
+      );
+    }
+  }
 
-  if (Array.isArray(rawGroups)) {
-    for (const group of rawGroups) {
-      if (Array.isArray(group.options)) {
-        for (const opt of group.options) {
-          if (opt && typeof opt.name === "string") {
-            verifiedModifierPriceMap.set(
-              opt.name.trim().toLowerCase(),
-              Number(opt.price_adjustment_paise) || 0,
-            );
-          }
-        }
-      }
+  // Fallback for legacy hardcoded string modifiers in case they are missing from DB
+  const legacyFallbacks = [
+    { name: "Regular", price_adjustment_paise: 0 },
+    { name: "Large", price_adjustment_paise: 6000 },
+    { name: "Jumbo / Family Pack", price_adjustment_paise: 12000 },
+    { name: "Mild", price_adjustment_paise: 0 },
+    { name: "Medium", price_adjustment_paise: 0 },
+    { name: "Spicy / Desi Hot", price_adjustment_paise: 0 },
+  ];
+  for (const opt of legacyFallbacks) {
+    const key = opt.name.trim().toLowerCase();
+    if (!verifiedModifierPriceMap.has(key)) {
+      verifiedModifierPriceMap.set(key, opt.price_adjustment_paise);
     }
   }
 

@@ -127,7 +127,7 @@ export function SupportTab({
               required
               rows={4}
               placeholder="Describe the issue, step to reproduce, or assistance needed..."
-              className="w-full border border-slate-300 rounded-xl p-4 text-xs font-bold text-slate-900 focus:outline-none focus:border-indigo-500 resize-none"
+              className="w-full border border-slate-300 rounded-xl p-4 text-xs font-bold text-slate-900 focus:outline-none focus:border-brand resize-none"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
@@ -136,7 +136,7 @@ export function SupportTab({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-indigo-600/20 transition-all cursor-pointer disabled:opacity-50 min-h-[44px]"
+            className="w-full py-4 rounded-xl bg-brand hover:bg-brand-dark text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-brand/20 transition-all cursor-pointer disabled:opacity-50 min-h-[44px]"
           >
             {isSubmitting ? "Dispatching Ticket..." : "Submit Ticket to Priority Queue →"}
           </button>
@@ -146,7 +146,7 @@ export function SupportTab({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-6 border-t border-slate-200">
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
             <span className="text-xs font-bold text-slate-500 block">Direct Email Support</span>
-            <span className="text-sm font-mono font-bold text-indigo-600 block">support@qrslice.com</span>
+            <span className="text-sm font-mono font-bold text-brand block">support@qrslice.com</span>
             <span className="text-[11px] text-slate-400 block">Response time: {"<"} 1 hour</span>
           </div>
 

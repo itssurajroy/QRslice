@@ -83,7 +83,7 @@ export function RoiCalculator() {
             {/* Slider 1: Tables */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="text-sm font-bold text-slate-800">
+                <label htmlFor="roi-tables" className="text-sm font-bold text-slate-800">
                   Number of Tables / Spots
                 </label>
                 <span className="text-base font-extrabold text-[#5738F5] bg-violet-50 px-3 py-1 rounded-xl border border-violet-200/60">
@@ -91,6 +91,7 @@ export function RoiCalculator() {
                 </span>
               </div>
               <input
+                id="roi-tables"
                 type="range"
                 min={4}
                 max={60}
@@ -108,7 +109,7 @@ export function RoiCalculator() {
             {/* Slider 2: Average Ticket Size */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="text-sm font-bold text-slate-800">
+                <label htmlFor="roi-avg-ticket" className="text-sm font-bold text-slate-800">
                   Average Order / Bill Value
                 </label>
                 <span className="text-base font-extrabold text-amber-700 bg-amber-50 px-3 py-1 rounded-xl border border-amber-200/60">
@@ -116,6 +117,7 @@ export function RoiCalculator() {
                 </span>
               </div>
               <input
+                id="roi-avg-ticket"
                 type="range"
                 min={150}
                 max={1800}
@@ -133,7 +135,7 @@ export function RoiCalculator() {
             {/* Slider 3: Daily Table Turnover */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <label className="text-sm font-bold text-slate-800">
+                <label htmlFor="roi-turns" className="text-sm font-bold text-slate-800">
                   Average Table Turns Per Day
                 </label>
                 <span className="text-base font-extrabold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-xl border border-emerald-200/60">
@@ -141,6 +143,7 @@ export function RoiCalculator() {
                 </span>
               </div>
               <input
+                id="roi-turns"
                 type="range"
                 min={1.5}
                 max={8}

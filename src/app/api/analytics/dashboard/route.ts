@@ -79,6 +79,32 @@ export async function GET(req: NextRequest) {
   const revenueDelta30d = monthRevenue > 0 ? Math.round(((todayRevenue * 30 - monthRevenue) / monthRevenue) * 1000) / 10 : 0;
   const ordersDelta30d = monthOrdersCount > 0 ? Math.round(((todayOrdersCount * 30 - monthOrdersCount) / monthOrdersCount) * 1000) / 10 : 0;
 
+  // Google Review / Feedback Analytics
+  const { data: auditEvents } = await db
+    .from("audit_events")
+    .select("action, metadata")
+    .eq("restaurant_id", restaurantId)
+    .eq("entity", "customer_feedback")
+    .gte("created_at", monthAgoStart.toISOString());
+
+  let totalFeedbacks30d = 0;
+  let fiveStarRatings30d = 0;
+  let googleReviewClicks30d = 0;
+
+  if (auditEvents) {
+    auditEvents.forEach((evt) => {
+      if (evt.action === "submit") {
+        totalFeedbacks30d++;
+        const meta = evt.metadata as any;
+        if (meta?.rating === 5 || meta?.rating === 4) {
+          fiveStarRatings30d++;
+        }
+      } else if (evt.action === "google_review_clicked") {
+        googleReviewClicks30d++;
+      }
+    });
+  }
+
   return NextResponse.json({
     ok: true,
     today: {
@@ -95,6 +121,12 @@ export async function GET(req: NextRequest) {
       vsYesterday: { revenue: revenueDelta, orders: ordersDelta, avg: avgDelta },
       vs7d: { revenue: revenueDelta7d, orders: ordersDelta7d },
       vs30d: { revenue: revenueDelta30d, orders: ordersDelta30d },
+    },
+    reputation: {
+      totalFeedbacks30d,
+      fiveStarRatings30d,
+      googleReviewClicks30d,
+      conversionRate: fiveStarRatings30d > 0 ? Math.round((googleReviewClicks30d / fiveStarRatings30d) * 100) : 0,
     },
   });
 }

@@ -20,7 +20,7 @@ export function ReportSummary({ report }: AnalyticsTabProps) {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
           <span className="text-xs font-bold text-slate-500 uppercase">Today Revenue</span>
-          <div className="text-2xl font-black text-indigo-600 font-mono">{paise(report.revenue)}</div>
+          <div className="text-2xl font-black text-brand font-mono">{paise(report.revenue)}</div>
         </div>
         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
           <span className="text-xs font-bold text-slate-500 uppercase">Paid Orders</span>
@@ -32,7 +32,7 @@ export function ReportSummary({ report }: AnalyticsTabProps) {
         </div>
         <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
           <span className="text-xs font-bold text-slate-500 uppercase">Avg Ticket Size</span>
-          <div className="text-2xl font-black text-indigo-600 font-mono">{paise(report.avg)}</div>
+          <div className="text-2xl font-black text-brand font-mono">{paise(report.avg)}</div>
         </div>
       </div>
     </div>
@@ -51,7 +51,7 @@ export function ComingSoonAnalyticsRoadmap() {
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 text-slate-100 shadow-xl overflow-hidden relative">
       {/* Background Ambient Glow */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-brand-lavender0/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* Top Banner Header */}
@@ -105,10 +105,10 @@ export function ComingSoonAnalyticsRoadmap() {
       {/* Grid of 4 Preview Feature Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
         {/* Feature Card 1 */}
-        <div className="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-indigo-500/40 transition-all space-y-4">
+        <div className="p-5 rounded-2xl bg-slate-800/60 border border-slate-700/60 hover:border-brand/40 transition-all space-y-4">
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-xl">
+              <div className="w-10 h-10 rounded-xl bg-brand-lavender0/10 border border-brand/30 flex items-center justify-center text-xl">
                 🤖
               </div>
               <div>
@@ -116,7 +116,7 @@ export function ComingSoonAnalyticsRoadmap() {
                 <span className="text-[10px] font-mono text-indigo-400">Deep Learning Prep Predictor</span>
               </div>
             </div>
-            <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-indigo-500/10 text-indigo-300 border border-indigo-500/30">
+            <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider bg-brand-lavender0/10 text-indigo-300 border border-brand/30">
               🔬 Model Training
             </span>
           </div>
@@ -271,24 +271,7 @@ export function FloorIntelligence({ loadingAnalytics, analytics, loadAnalytics }
               </div>
 
               {(() => {
-                const slots = analytics.hourly_slots || [
-                  { hour: "8 AM", count: 0, label: "Breakfast" },
-                  { hour: "9 AM", count: 0, label: "Coffee Rush" },
-                  { hour: "10 AM", count: 0, label: "Brunch" },
-                  { hour: "11 AM", count: 0, label: "Brunch Peak" },
-                  { hour: "12 PM", count: 0, label: "Lunch Rush" },
-                  { hour: "1 PM", count: 0, label: "Peak Lunch" },
-                  { hour: "2 PM", count: 0, label: "Post Lunch" },
-                  { hour: "3 PM", count: 0, label: "Afternoon" },
-                  { hour: "4 PM", count: 0, label: "Tea & Snacks" },
-                  { hour: "5 PM", count: 0, label: "Evening Rush" },
-                  { hour: "6 PM", count: 0, label: "Early Dinner" },
-                  { hour: "7 PM", count: 0, label: "Dinner Rush" },
-                  { hour: "8 PM", count: 0, label: "Dinner Peak" },
-                  { hour: "9 PM", count: 0, label: "Late Dinner" },
-                  { hour: "10 PM", count: 0, label: "Closing Orders" },
-                  { hour: "11 PM", count: 0, label: "Last Call" },
-                ];
+                const slots = analytics.hourly_slots || [];
                 const maxCount = Math.max(1, ...slots.map((s: any) => s.count || 0));
 
                 return (
@@ -315,7 +298,7 @@ export function FloorIntelligence({ loadingAnalytics, analytics, loadAnalytics }
 
                           {/* Tooltip on Hover */}
                           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-white border border-slate-200 text-slate-900 text-xs rounded-lg p-2 whitespace-nowrap shadow-xl z-20 pointer-events-none font-sans">
-                            <p className="font-bold text-indigo-600">{slot.hour} • {slot.label}</p>
+                            <p className="font-bold text-brand">{slot.hour} • {slot.label}</p>
                             <p className="text-slate-500 font-mono">{slot.count || 0} guest orders</p>
                           </div>
                         </div>
@@ -352,7 +335,7 @@ export function FloorIntelligence({ loadingAnalytics, analytics, loadAnalytics }
                           <span className="text-slate-900 font-medium">{it.name}</span>
                         </div>
                         <div className="text-right">
-                          <span className="text-indigo-600 font-mono font-bold">×{it.quantity || it.count || 1}</span>
+                          <span className="text-brand font-mono font-bold">×{it.quantity || it.count || 1}</span>
                         </div>
                       </div>
                     ));
@@ -369,7 +352,7 @@ export function FloorIntelligence({ loadingAnalytics, analytics, loadAnalytics }
                   <div className="space-y-2.5 text-xs">
                     <div className="flex justify-between items-center p-2 rounded-xl bg-white border border-slate-200">
                       <span className="text-slate-600 font-medium">💵 Cash at Counter</span>
-                      <span className="font-bold font-mono text-indigo-600">
+                      <span className="font-bold font-mono text-brand">
                         {analytics.cash_count ?? 0} orders (PAID)
                       </span>
                     </div>
@@ -382,7 +365,7 @@ export function FloorIntelligence({ loadingAnalytics, analytics, loadAnalytics }
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-xs text-slate-600">
+                <div className="p-3 rounded-xl bg-brand-lavender border border-indigo-100 text-xs text-slate-600">
                   💡 <strong>Smart Floor Tip</strong>: Real-time floor occupancy and kitchen order velocity are synchronized live from your Supabase database tables.
                 </div>
               </div>

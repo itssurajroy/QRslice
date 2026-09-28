@@ -88,9 +88,9 @@ export default function SubscriptionForm({
             onChange={(e) => setTierValue(e.target.value)}
             className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            <option value="basic">basic</option>
+            <option value="starter">starter</option>
             <option value="pro">pro</option>
-            <option value="all_in_one">all_in_one</option>
+            <option value="enterprise">enterprise</option>
           </select>
         </label>
       </div>

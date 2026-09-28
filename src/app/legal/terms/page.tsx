@@ -103,7 +103,7 @@ export default function TermsPage() {
               </li>
               <li>
                 Subscription fees are non-refundable except as stated in our{" "}
-                <Link href="/legal/refund" className="text-indigo-600 hover:underline">
+                <Link href="/legal/refund" className="text-brand hover:underline">
                   Refund Policy
                 </Link>
                 .
@@ -285,7 +285,7 @@ export default function TermsPage() {
                 Email:{" "}
                 <a
                   href="mailto:support@qrslice.com"
-                  className="text-indigo-600 hover:underline"
+                  className="text-brand hover:underline"
                 >
                   support@qrslice.com
                 </a>

@@ -42,6 +42,14 @@ export function DashboardTab({
     orders: number;
     avg: number;
   }>({ revenue: 0, orders: 0, avg: 0 });
+  
+  const [reputation, setReputation] = useState<{
+    totalFeedbacks30d: number;
+    fiveStarRatings30d: number;
+    googleReviewClicks30d: number;
+    conversionRate: number;
+  }>({ totalFeedbacks30d: 0, fiveStarRatings30d: 0, googleReviewClicks30d: 0, conversionRate: 0 });
+
   const [loadingDeltas, setLoadingDeltas] = useState(true);
 
   // Fetch real deltas from analytics API
@@ -50,8 +58,9 @@ export function DashboardTab({
     fetch(`/api/analytics/dashboard`)
       .then((r) => r.ok ? r.json() : null)
       .then((d) => {
-        if (d?.ok && d.deltas?.vsYesterday) {
-          setDeltas(d.deltas.vsYesterday);
+        if (d?.ok) {
+          if (d.deltas?.vsYesterday) setDeltas(d.deltas.vsYesterday);
+          if (d.reputation) setReputation(d.reputation);
         }
       })
       .catch(() => {})
@@ -265,7 +274,7 @@ export function DashboardTab({
             <span className="text-xs font-extrabold uppercase tracking-wider text-[#6F7185]">
               Active Tables
             </span>
-            <span className="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <span className="w-8 h-8 rounded-xl bg-brand-lavender text-brand flex items-center justify-center">
               <ChairIcon className="w-4 h-4" />
             </span>
           </div>
@@ -452,8 +461,8 @@ export function DashboardTab({
           </div>
         </div>
 
-        {/* Bottom 3-Section Grid: Top Selling, Recent Orders, Payment Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+        {/* Bottom 4-Section Grid: Top Selling, Recent Orders, Payment Summary, Reputation */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 pt-2">
           {/* Top Selling Items */}
           <div className="space-y-3">
             <div className="text-xs font-black uppercase tracking-wider text-[#17142B] border-b border-slate-100 pb-2">
@@ -559,6 +568,38 @@ export function DashboardTab({
               </div>
             )}
           </div>
+
+          {/* Reputation Funnel (New Widget) */}
+          <div className="space-y-3">
+            <div className="text-xs font-black uppercase tracking-wider text-[#17142B] border-b border-slate-100 pb-2 flex justify-between items-center">
+              <span>Google Reviews (30d)</span>
+            </div>
+            
+            <div className="space-y-3 text-xs">
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                <div className="font-bold text-slate-600">Total Feedback Received</div>
+                <div className="font-mono font-black text-slate-900">{reputation.totalFeedbacks30d}</div>
+              </div>
+
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-amber-50 border border-amber-200/50">
+                <div className="font-bold text-amber-700 flex items-center gap-1.5">
+                  <span className="text-amber-500">★</span> High Ratings (4-5)
+                </div>
+                <div className="font-mono font-black text-amber-900">{reputation.fiveStarRatings30d}</div>
+              </div>
+
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-indigo-50 border border-indigo-200/50">
+                <div className="font-bold text-indigo-700">Google Redirects</div>
+                <div className="font-mono font-black text-indigo-900">{reputation.googleReviewClicks30d}</div>
+              </div>
+              
+              <div className="flex items-center justify-between pt-1">
+                <div className="font-bold text-slate-500 text-[10px] uppercase">Conversion Rate</div>
+                <div className="font-black text-emerald-600 text-sm">{reputation.conversionRate}%</div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

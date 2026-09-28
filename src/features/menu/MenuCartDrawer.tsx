@@ -1,6 +1,8 @@
 // Copyright (c) 2026 QRslice. All rights reserved.
 "use client";
 
+import { useState, useEffect } from "react";
+import QRCode from "qrcode";
 import { ShoppingBagIcon } from "@/components/Icons";
 import { paise } from "@/lib/utils";
 import type { CartLine } from "@/types";
@@ -28,6 +30,7 @@ interface MenuCartDrawerProps {
   onUpdateNote: (id: string, note: string) => void;
   t: Record<string, string>;
   upiQrUrl?: string;
+  upiId?: string;
   bookingCode?: string;
   setBookingCode?: (v: string) => void;
 }
@@ -55,10 +58,24 @@ export function MenuCartDrawer({
   onUpdateNote,
   t,
   upiQrUrl,
+  upiId,
   bookingCode,
   setBookingCode,
 }: MenuCartDrawerProps) {
   if (!cartOpen) return null;
+
+  const [dynamicUpiQr, setDynamicUpiQr] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (paymentMethod === "online" && !upiQrUrl && upiId && totalPaise > 0) {
+      const amount = (totalPaise / 100).toFixed(2);
+      const pn = encodeURIComponent(restaurantName);
+      const uri = `upi://pay?pa=${upiId}&pn=${pn}&am=${amount}&cu=INR`;
+      QRCode.toDataURL(uri, { width: 220, margin: 1 }).then(setDynamicUpiQr).catch(() => {});
+    } else {
+      setDynamicUpiQr(null);
+    }
+  }, [paymentMethod, upiQrUrl, upiId, totalPaise, restaurantName]);
 
   return (
     <div
@@ -109,12 +126,15 @@ export function MenuCartDrawer({
                       {l.item.name}
                     </span>
                     <span className="text-xs text-[#5738F5] font-black font-mono">
-                      {paise(l.item.price_paise * l.quantity)}
+                      {paise((l.item.price_paise + (l.selectedModifiers || []).reduce((a, m) => a + m.price_delta_paise, 0)) * l.quantity)}
                     </span>
-                    {(l.spiceLevel || l.sizeVariant) && (
-                      <div className="text-[11px] text-slate-500 mt-0.5 flex flex-wrap gap-2 font-medium">
-                        {l.spiceLevel && <span className="bg-red-50 text-red-700 px-1.5 py-0.2 rounded border border-red-200">🌶️ {l.spiceLevel}</span>}
-                        {l.sizeVariant && <span className="bg-slate-100 text-slate-700 px-1.5 py-0.2 rounded border border-slate-200">📏 {l.sizeVariant}</span>}
+                    {l.selectedModifiers && l.selectedModifiers.length > 0 && (
+                      <div className="text-[10px] text-slate-500 mt-1 flex flex-wrap gap-1 font-medium leading-tight">
+                        {l.selectedModifiers.map(m => (
+                          <span key={m.id} className="bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded border border-slate-200">
+                            {m.name} {m.price_delta_paise > 0 && `(+${paise(m.price_delta_paise)})`}
+                          </span>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -212,12 +232,12 @@ export function MenuCartDrawer({
           </div>
 
           {/* Render UPI QR if selected and available */}
-          {paymentMethod === "online" && upiQrUrl && (
+          {paymentMethod === "online" && (upiQrUrl || dynamicUpiQr) && (
             <div className="flex flex-col items-center p-4 bg-slate-50 border border-slate-200 rounded-2xl animate-fade-in-up">
               <span className="text-xs font-black text-slate-900 mb-2 uppercase tracking-widest text-center">
                 Scan Store QR to Pay
               </span>
-              <img src={upiQrUrl} alt="Store UPI QR" className="w-32 h-32 rounded-xl bg-white p-2 border border-slate-200 shadow-sm" />
+              <img src={(upiQrUrl || dynamicUpiQr) as string} alt="Store UPI QR" className="w-32 h-32 rounded-xl bg-white p-2 border border-slate-200 shadow-sm" />
               <span className="text-xs font-bold text-[#5738F5] mt-2 text-center font-mono">
                 Pay exact amount ₹{(totalPaise / 100).toFixed(2)}
               </span>

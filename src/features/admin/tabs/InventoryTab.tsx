@@ -191,7 +191,7 @@ export function InventoryTab({ flash }: { flash: (kind: "ok" | "err", msg: strin
           <button
             type="button"
             onClick={() => setShowAddForm(true)}
-            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer min-h-[44px]"
+            className="px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-xs shadow-md transition-all cursor-pointer min-h-[44px]"
           >
             + Add Ingredient
           </button>
@@ -228,7 +228,7 @@ export function InventoryTab({ flash }: { flash: (kind: "ok" | "err", msg: strin
           </div>
         ) : ingredients.length === 0 ? (
           <div className="p-12 text-center space-y-3">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-xl font-bold">
+            <div className="w-12 h-12 rounded-2xl bg-brand-lavender text-brand flex items-center justify-center mx-auto text-xl font-bold">
               📦
             </div>
             <p className="text-sm font-bold text-slate-700">No ingredients registered yet.</p>
@@ -238,7 +238,7 @@ export function InventoryTab({ flash }: { flash: (kind: "ok" | "err", msg: strin
             <button
               type="button"
               onClick={() => setShowAddForm(true)}
-              className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-brand text-white font-bold text-xs cursor-pointer"
             >
               + Create First Ingredient
             </button>
@@ -278,7 +278,7 @@ export function InventoryTab({ flash }: { flash: (kind: "ok" | "err", msg: strin
                     <td className="px-6 py-4 font-mono font-bold text-slate-800">
                       {ing.storage_quantity} {ing.unit}
                     </td>
-                    <td className="px-6 py-4 font-mono font-bold text-indigo-600">
+                    <td className="px-6 py-4 font-mono font-bold text-brand">
                       {ing.total_quantity} {ing.unit}
                     </td>
                     <td className="px-6 py-4 font-mono text-slate-500">
@@ -288,7 +288,7 @@ export function InventoryTab({ flash }: { flash: (kind: "ok" | "err", msg: strin
                       <button
                         type="button"
                         onClick={() => { setSelectedIngredient(ing); setShowTransferForm(true); }}
-                        className="px-2.5 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 font-bold hover:bg-indigo-100 transition-colors cursor-pointer min-h-[36px]"
+                        className="px-2.5 py-1.5 rounded-lg bg-brand-lavender text-brand font-bold hover:bg-brand-lavender transition-colors cursor-pointer min-h-[36px]"
                       >
                         🔄 Transfer
                       </button>
@@ -367,7 +367,7 @@ export function InventoryTab({ flash }: { flash: (kind: "ok" | "err", msg: strin
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white font-black text-xs cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-brand text-white font-black text-xs cursor-pointer"
                 >
                   Add Ingredient ✓
                 </button>
@@ -429,7 +429,7 @@ export function InventoryTab({ flash }: { flash: (kind: "ok" | "err", msg: strin
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white font-black text-xs cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-brand text-white font-black text-xs cursor-pointer"
                 >
                   Confirm Transfer
                 </button>

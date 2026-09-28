@@ -31,6 +31,11 @@ export type OrderItem = {
   notes?: string | null;
   spice_level?: string | null;
   size_variant?: string | null;
+  selected_modifiers?: {
+    id?: string;
+    option_name: string;
+    price_delta_paise: number;
+  }[];
 };
 
 export type Order = {
@@ -78,6 +83,29 @@ export type MenuItem = {
   hsn?: string | null;
   restaurant_id: string;
   sort_order?: number;
+  is_bestseller?: boolean;
+  spice_index?: number;
+  tags?: string[];
+  cross_sell_items?: string[];
+  modifier_groups?: ModifierGroup[];
+};
+
+export type ModifierOption = {
+  id: string;
+  modifier_group_id: string;
+  name: string;
+  price_delta_paise: number;
+  active: boolean;
+};
+
+export type ModifierGroup = {
+  id: string;
+  restaurant_id: string;
+  name: string;
+  min_select: number;
+  max_select: number;
+  required: boolean;
+  options?: ModifierOption[];
 };
 
 export type CartLine = {
@@ -86,6 +114,7 @@ export type CartLine = {
   notes: string;
   spiceLevel?: string;
   sizeVariant?: string;
+  selectedModifiers?: ModifierOption[];
 };
 
 // ─── Tables ───────────────────────────────────────────────────────────────────
@@ -103,7 +132,7 @@ export type Table = {
 // ─── Restaurant ───────────────────────────────────────────────────────────────
 
 export type RestaurantPlan = "trial" | "active" | "suspended" | "cancelled";
-export type RestaurantTier = "all_in_one" | "pro" | "basic";
+export type RestaurantTier = "enterprise" | "pro" | "starter";
 
 export type Restaurant = {
   id: string;

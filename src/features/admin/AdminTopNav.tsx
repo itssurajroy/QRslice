@@ -32,7 +32,6 @@ export type AdminTabId =
   | "branding"
   | "settings"
   | "staff"
-  | "communications"
   | "support"
   | "report"
   | "help";
@@ -104,7 +103,7 @@ export function AdminTopNav({ tab, setTab }: AdminTopNavProps) {
                 onClick={() => setTab(t.id)}
                 className={`px-3 py-1.5 text-xs font-bold rounded-xl transition-all whitespace-nowrap cursor-pointer min-h-[36px] flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                   active
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/25 font-extrabold"
+                    ? "bg-brand text-white shadow-md shadow-brand/25 font-extrabold"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
@@ -113,7 +112,7 @@ export function AdminTopNav({ tab, setTab }: AdminTopNavProps) {
                 {t.badge && (
                   <span
                     className={`ml-0.5 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-md ${
-                      active ? "bg-white/20 text-white" : "bg-indigo-100 text-indigo-700"
+                      active ? "bg-white/20 text-white" : "bg-brand-lavender text-brand-dark"
                     }`}
                   >
                     {t.badge}

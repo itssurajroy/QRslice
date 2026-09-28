@@ -81,7 +81,7 @@ export function PlatformConfigForm({
             max={90}
             value={trialDays}
             onChange={(e) => setTrialDays(Number(e.target.value))}
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </label>
         <label className="space-y-1">
@@ -93,7 +93,7 @@ export function PlatformConfigForm({
             min={0}
             value={monthly}
             onChange={(e) => setMonthly(Number(e.target.value))}
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </label>
         <label className="space-y-1">
@@ -105,7 +105,7 @@ export function PlatformConfigForm({
             min={0}
             value={yearly}
             onChange={(e) => setYearly(Number(e.target.value))}
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </label>
       </div>
@@ -127,7 +127,7 @@ export function PlatformConfigForm({
       <button
         type="submit"
         disabled={loading}
-        className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs cursor-pointer"
+        className="px-4 py-2 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs cursor-pointer"
       >
         {loading ? "Saving…" : "Save Settings"}
       </button>
@@ -212,21 +212,21 @@ export function FlagsManager({ initialFlags }: { initialFlags: FlagRow[] }) {
             maxLength={50}
             pattern="[a-z0-9-]+"
             placeholder="new-checkout"
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 placeholder-slate-400 font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 placeholder-slate-400 font-mono focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           <input
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={200}
             placeholder="Description (optional)"
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
         </div>
         {error && <p className="text-xs font-bold text-red-600">{error}</p>}
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs cursor-pointer"
+          className="px-4 py-2 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs cursor-pointer"
         >
           {loading ? "Creating…" : "Create Flag"}
         </button>

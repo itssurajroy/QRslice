@@ -55,7 +55,7 @@ export async function sendInvoiceEmail(opts: {
       `<h1 style="font-family:sans-serif;color:#0f172a;">${escapeHtml(restaurantName)}</h1>`,
       `<p style="font-family:sans-serif;">Thanks for your visit. Your tax invoice for order <strong>#${escapeHtml(String(orderNumber))}</strong> is attached.</p>`,
       `<p style="font-family:sans-serif;"><strong>Total: ₹${escapeHtml(totalRupees)}</strong></p>`,
-      `<p style="color:#64748b;font-size:12px;">QRslice · Generated automatically</p>`,
+      `<p style="color:#64748b;font-size:12px;">QRslice · Generated automatically<br><br>123 QRslice Blvd, Tech District, 94107<br><a href="https://qrslice.com/unsubscribe" style="color:#64748b;">Unsubscribe</a></p>`,
     ].join(""),
     attachments: [
       {

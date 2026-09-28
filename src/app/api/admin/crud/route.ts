@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
     if (!isManagerOrOwner) {
       return NextResponse.json({ error: "Forbidden: Manager or Owner role required" }, { status: 403 });
     }
-    const { categoryId, name, pricePaise, description, isVeg, imageUrl } = data;
+    const { categoryId, name, pricePaise, description, isVeg, imageUrl, isBestseller, spiceIndex, tags } = data;
     const { data: item, error } = await admin
       .from("menu_items")
       .insert({
@@ -107,6 +107,9 @@ export async function POST(req: NextRequest) {
         price_paise: Number(pricePaise || 0),
         description: String(description || "").trim(),
         is_veg: Boolean(isVeg),
+        is_bestseller: Boolean(isBestseller),
+        spice_index: Number(spiceIndex || 0),
+        tags: Array.isArray(tags) ? tags : [],
         image_url: imageUrl || null,
         available: true,
       })
@@ -167,6 +170,9 @@ export async function POST(req: NextRequest) {
   }
 
   if (type === "create_table") {
+    if (!isManagerOrOwner) {
+      return NextResponse.json({ error: "Forbidden: Manager or Owner role required" }, { status: 403 });
+    }
     const { label, seats } = data;
     const cleanLabel = String(label || "").trim();
     if (!cleanLabel) {
@@ -190,6 +196,9 @@ export async function POST(req: NextRequest) {
   }
 
   if (type === "update_table") {
+    if (!isManagerOrOwner) {
+      return NextResponse.json({ error: "Forbidden: Manager or Owner role required" }, { status: 403 });
+    }
     const { tableId, label, seats, active } = data;
     if (!tableId) {
       return NextResponse.json({ error: "Table ID required" }, { status: 400 });
@@ -223,6 +232,9 @@ export async function POST(req: NextRequest) {
   }
 
   if (type === "toggle_table_active") {
+    if (!isManagerOrOwner) {
+      return NextResponse.json({ error: "Forbidden: Manager or Owner role required" }, { status: 403 });
+    }
     const { tableId, active } = data;
     if (!tableId) {
       return NextResponse.json({ error: "Table ID required" }, { status: 400 });
@@ -241,6 +253,9 @@ export async function POST(req: NextRequest) {
   }
 
   if (type === "regenerate_qr") {
+    if (!isManagerOrOwner) {
+      return NextResponse.json({ error: "Forbidden: Manager or Owner role required" }, { status: 403 });
+    }
     const { tableId } = data;
     if (!tableId) {
       return NextResponse.json({ error: "Table ID required" }, { status: 400 });

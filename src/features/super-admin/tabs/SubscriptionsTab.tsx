@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import { useSuperAdmin } from "../SuperAdminContext";
 
 export function SubscriptionsTab() {
-  const { tab, cafes, openDrawer } = useSuperAdmin();
+  const { tab, cafes, openDrawer, subscriptionPlans } = useSuperAdmin();
   const [search, setSearch] = useState("");
   const [apiMrrPaise, setApiMrrPaise] = useState<number | null>(null);
 
@@ -17,13 +17,18 @@ export function SubscriptionsTab() {
       .catch(() => {});
   }, []);
 
+  // Extract live monthly price from context
+  const activePlan = (subscriptionPlans || []).find((p: any) => p.billing_cycle === "monthly" && p.active !== false);
+  const monthlyPaise = activePlan?.price_paise || 99900;
+  const monthlyRupees = Math.round(monthlyPaise / 100);
+
   // Calculate stats based on cafe plan & billing_status
   const activeCafes = cafes.filter((c: any) => c.plan === "active" || c.billing_status === "active");
   const trialCafes = cafes.filter((c: any) => c.plan === "trial" || (!c.plan && c.billing_status !== "active"));
   const suspendedCafes = cafes.filter((c: any) => c.plan === "suspended" || c.plan === "cancelled");
   
-  // Single plan at ₹999/month — prefer server MRR (mrr_cents sums, integer paise).
-  const mrr = apiMrrPaise !== null ? Math.round(apiMrrPaise / 100) : activeCafes.length * 999;
+  // Prefer server MRR (mrr_cents sums, integer paise).
+  const mrr = apiMrrPaise !== null ? Math.round(apiMrrPaise / 100) : activeCafes.length * monthlyRupees;
 
   const filtered = cafes.filter((c: any) => 
     c.name?.toLowerCase().includes(search.toLowerCase()) || 
@@ -46,7 +51,7 @@ export function SubscriptionsTab() {
           </div>
           <div className="mt-3 text-xs text-emerald-700 font-semibold flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-            ₹999 / active subscriber
+            ₹{monthlyRupees.toLocaleString("en-IN")} / active subscriber
           </div>
         </div>
 

@@ -7,10 +7,6 @@
     {
       "path": "/api/cron/whatsapp-campaigns",
       "schedule": "0 10 * * *"
-    },
-    {
-      "path": "/api/cron/whatsapp-dispatch",
-      "schedule": "*/2 * * * *"
     }
   ]
 }

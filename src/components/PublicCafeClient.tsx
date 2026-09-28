@@ -41,6 +41,8 @@ interface PublicCafeClientProps {
   limits: TierLimits;
   upiQrUrl?: string;
   initialTableLabel?: string;
+  modifierGroups?: any[];
+  itemModifiers?: any[];
 }
 
 type DietFilter = "all" | "veg" | "nonveg";
@@ -48,10 +50,13 @@ type DietFilter = "all" | "veg" | "nonveg";
 export type CartItemCustomization = {
   item: Item;
   quantity: number;
-  portion: "Regular" | "Full";
-  portionExtraPaise: number;
-  selectedAddOns: Array<{ name: string; pricePaise: number }>;
-  spiceLevel: "Mild" | "Medium" | "Spicy";
+  selectedOptions: Array<{
+    groupId: string;
+    groupName: string;
+    optionId: string;
+    optionName: string;
+    pricePaise: number;
+  }>;
   notes: string;
 };
 
@@ -89,6 +94,8 @@ export default function PublicCafeClient({
   canOrder,
   upiQrUrl,
   initialTableLabel,
+  modifierGroups = [],
+  itemModifiers = [],
 }: PublicCafeClientProps) {
   const router = useRouter();
 
@@ -120,9 +127,7 @@ export default function PublicCafeClient({
 
   // Product Customization Drawer
   const [customizingItem, setCustomizingItem] = useState<Item | null>(null);
-  const [selectedPortion, setSelectedPortion] = useState<"Regular" | "Full">("Regular");
-  const [selectedAddOns, setSelectedAddOns] = useState<Array<{ name: string; pricePaise: number }>>([]);
-  const [selectedSpice, setSelectedSpice] = useState<"Mild" | "Medium" | "Spicy">("Medium");
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string[]>>({});
   const [customNotes, setCustomNotes] = useState("");
 
   // Customer identity
@@ -298,15 +303,13 @@ export default function PublicCafeClient({
   // Open item drawer
   const openCustomization = (item: Item) => {
     setCustomizingItem(item);
-    setSelectedPortion("Regular");
-    setSelectedAddOns([]);
-    setSelectedSpice("Medium");
+    setSelectedOptions({});
     setCustomNotes("");
   };
 
   // Quick 1-click add
   const quickAddItem = (item: Item) => {
-    const lineKey = `${item.id}_Regular_none`;
+    const lineKey = `${item.id}_none`;
     setCart((prev) => {
       const existing = prev[lineKey];
       return {
@@ -314,10 +317,7 @@ export default function PublicCafeClient({
         [lineKey]: {
           item,
           quantity: (existing?.quantity || 0) + 1,
-          portion: "Regular",
-          portionExtraPaise: 0,
-          selectedAddOns: [],
-          spiceLevel: "Medium",
+          selectedOptions: [],
           notes: "",
         },
       };
@@ -328,12 +328,38 @@ export default function PublicCafeClient({
   const handleAddCustomizedToCart = () => {
     if (!customizingItem) return;
 
-    const portionExtraPaise = selectedPortion === "Full" ? Math.round(customizingItem.price_paise * 0.4) : 0;
-    const sortedAddOnsKey = selectedAddOns
-      .map((a) => a.name)
-      .sort()
-      .join(",");
-    const lineKey = `${customizingItem.id}_${selectedPortion}_${sortedAddOnsKey}_${selectedSpice}`;
+    // Filter relevant groups
+    const itemModLinks = itemModifiers?.filter((m: any) => m.menu_item_id === customizingItem.id) || [];
+    const itemGroups = modifierGroups?.filter((g: any) => itemModLinks.some((l: any) => l.modifier_group_id === g.id)) || [];
+    
+    // Validate Required
+    for (const g of itemGroups) {
+      const selected = selectedOptions[g.id] || [];
+      if (g.required && selected.length < 1) {
+        alert(`Please select an option for ${g.name}`);
+        return;
+      }
+    }
+
+    const optionsFlat: Array<{groupId: string, groupName: string, optionId: string, optionName: string, pricePaise: number}> = [];
+    for (const g of itemGroups) {
+      const selectedIds = selectedOptions[g.id] || [];
+      for (const optId of selectedIds) {
+        const opt = g.modifier_options.find((o: any) => o.id === optId);
+        if (opt) {
+          optionsFlat.push({
+            groupId: g.id,
+            groupName: g.name,
+            optionId: opt.id,
+            optionName: opt.name,
+            pricePaise: opt.price_delta_paise,
+          });
+        }
+      }
+    }
+
+    const sortedIds = optionsFlat.map(o => o.optionId).sort().join(",");
+    const lineKey = `${customizingItem.id}_${sortedIds}`;
 
     setCart((prev) => {
       const existing = prev[lineKey];
@@ -342,10 +368,7 @@ export default function PublicCafeClient({
         [lineKey]: {
           item: customizingItem,
           quantity: (existing?.quantity || 0) + 1,
-          portion: selectedPortion,
-          portionExtraPaise,
-          selectedAddOns,
-          spiceLevel: selectedSpice,
+          selectedOptions: optionsFlat,
           notes: customNotes.trim(),
         },
       };
@@ -377,8 +400,8 @@ export default function PublicCafeClient({
 
   const totalPaise = useMemo(() => {
     return cartLines.reduce((sum, line) => {
-      const addOnsTotal = line.selectedAddOns.reduce((a, b) => a + b.pricePaise, 0);
-      const unitPaise = line.item.price_paise + line.portionExtraPaise + addOnsTotal;
+      const optionsTotal = line.selectedOptions.reduce((a, b) => a + b.pricePaise, 0);
+      const unitPaise = line.item.price_paise + optionsTotal;
       return sum + unitPaise * line.quantity;
     }, 0);
   }, [cartLines]);
@@ -453,34 +476,20 @@ export default function PublicCafeClient({
         paymentMethod,
         items: cartLines.map((line) => {
           const notesParts = [
-            line.portion !== "Regular" ? `Portion: ${line.portion}` : null,
-            line.selectedAddOns.length > 0 ? `Add-ons: ${line.selectedAddOns.map((a) => a.name).join(", ")}` : null,
+            line.selectedOptions.length > 0 ? `Options: ${line.selectedOptions.map((a) => a.optionName).join(", ")}` : null,
             line.notes,
           ].filter(Boolean);
 
-          const modifiers: Array<{ option_name: string; price_delta_paise: number }> = [];
-
-          if (line.portion && line.portion !== "Regular" && line.portionExtraPaise > 0) {
-            modifiers.push({
-              option_name: `Portion: ${line.portion}`,
-              price_delta_paise: line.portionExtraPaise,
-            });
-          }
-
-          if (line.selectedAddOns && line.selectedAddOns.length > 0) {
-            for (const addon of line.selectedAddOns) {
-              modifiers.push({
-                option_name: addon.name,
-                price_delta_paise: addon.pricePaise,
-              });
-            }
-          }
+          const modifiers = line.selectedOptions.map(opt => ({
+            option_name: opt.optionName,
+            price_delta_paise: opt.pricePaise,
+          }));
 
           return {
             itemId: line.item.id,
             quantity: line.quantity,
             notes: notesParts.length > 0 ? notesParts.join(" | ") : undefined,
-            spiceLevel: line.spiceLevel,
+            spiceLevel: "Medium",
             modifiers,
           };
         }),
@@ -508,7 +517,7 @@ export default function PublicCafeClient({
         setActiveOrderToken(statusToken);
 
         const loyalty = (res.data as any)?.loyalty;
-        const qs = loyalty?.pointsEarned ? `?earned=${loyalty.pointsEarned}&total=${loyalty.newTotalPoints}` : "";
+        const qs = loyalty?.pointsEarned ? `?earned=${loyalty.pointsEarned}${loyalty.newTotalPoints ? `&total=${loyalty.newTotalPoints}` : ""}` : "";
         router.push(`/order/${statusToken}${qs}`);
       } else {
         setOrderError("Order placed successfully. Please notify your server for your ticket.");
@@ -622,7 +631,7 @@ export default function PublicCafeClient({
 
             {/* Right: Quick Actions */}
             <div className="flex items-center gap-2 shrink-0">
-              <InstallPwaButton className="hidden sm:flex px-2 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs border border-indigo-200 transition-colors" />
+              <InstallPwaButton className="hidden sm:flex px-2 py-1.5 rounded-xl bg-brand-lavender hover:bg-brand-lavender text-brand-dark font-bold text-xs border border-indigo-200 transition-colors" />
               
               {/* Search Toggle */}
               <button
@@ -1187,114 +1196,64 @@ export default function PublicCafeClient({
                 )}
               </div>
 
-              {/* Portion Selector */}
-              <div>
-                <label className="text-xs font-black text-stone-900 uppercase tracking-wider block mb-2">
-                  Choose Portion
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPortion("Regular")}
-                    className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                      selectedPortion === "Regular"
-                        ? "bg-amber-50 border-amber-400 text-amber-950 font-bold shadow-2xs"
-                        : "bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black">Regular Portion</span>
-                      <span className="text-xs font-mono">{paise(customizingItem.price_paise)}</span>
-                    </div>
-                    <span className="text-[10px] text-stone-500">Standard serving for 1</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPortion("Full")}
-                    className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                      selectedPortion === "Full"
-                        ? "bg-amber-50 border-amber-400 text-amber-950 font-bold shadow-2xs"
-                        : "bg-stone-50 border-stone-200 text-stone-700 hover:bg-stone-100"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black">Full Portion</span>
-                      <span className="text-xs font-mono">
-                        {paise(customizingItem.price_paise + Math.round(customizingItem.price_paise * 0.4))}
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-stone-500">Family serving (+40%)</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Add-ons / Modifiers */}
-              <div>
-                <label className="text-xs font-black text-stone-900 uppercase tracking-wider block mb-2">
-                  Recommended Add-ons
-                </label>
-                <div className="space-y-2">
-                  {[
-                    { name: "Butter Naan", pricePaise: 4000 },
-                    { name: "Garlic Naan", pricePaise: 5500 },
-                    { name: "Extra Gravy", pricePaise: 6000 },
-                    { name: "Green Salad & Mint Dip", pricePaise: 3000 },
-                  ].map((addOn) => {
-                    const isChecked = selectedAddOns.some((a) => a.name === addOn.name);
-                    return (
-                      <label
-                        key={addOn.name}
-                        className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-all ${
-                          isChecked ? "bg-amber-50/60 border-amber-300" : "bg-stone-50 border-stone-200 hover:bg-stone-100"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={isChecked}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setSelectedAddOns((prev) => [...prev, addOn]);
-                              } else {
-                                setSelectedAddOns((prev) => prev.filter((a) => a.name !== addOn.name));
-                              }
-                            }}
-                            className="rounded text-amber-600 focus:ring-amber-500"
-                          />
-                          <span className="text-xs font-bold text-stone-800">{addOn.name}</span>
-                        </div>
-                        <span className="text-xs font-mono font-bold text-stone-600">+{paise(addOn.pricePaise)}</span>
+              {/* Dynamic Modifiers */}
+              {(() => {
+                const itemModLinks = itemModifiers?.filter((m: any) => m.menu_item_id === customizingItem.id) || [];
+                const itemGroups = modifierGroups?.filter((g: any) => itemModLinks.some((l: any) => l.modifier_group_id === g.id)) || [];
+                
+                return itemGroups.map((group) => {
+                  return (
+                    <div key={group.id}>
+                      <label className="text-xs font-black text-stone-900 uppercase tracking-wider block mb-2">
+                        {group.name} {group.required && <span className="text-red-500">*</span>}
+                        {group.max_select > 1 && <span className="text-stone-400 font-normal ml-2">(Max {group.max_select})</span>}
                       </label>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Spice Level Selection */}
-              <div>
-                <label className="text-xs font-black text-stone-900 uppercase tracking-wider block mb-2">
-                  Spice Level
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(["Mild", "Medium", "Spicy"] as const).map((spice) => (
-                    <button
-                      key={spice}
-                      type="button"
-                      onClick={() => setSelectedSpice(spice)}
-                      className={`py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                        selectedSpice === spice
-                          ? "bg-amber-100 border-amber-300 text-amber-950 font-black shadow-2xs"
-                          : "bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100"
-                      }`}
-                    >
-                      {spice === "Mild" && "🌿 Mild"}
-                      {spice === "Medium" && "🌶️ Medium"}
-                      {spice === "Spicy" && "🔥 Spicy"}
-                    </button>
-                  ))}
-                </div>
-              </div>
+                      <div className="space-y-2">
+                        {group.modifier_options?.map((opt: any) => {
+                          const isChecked = (selectedOptions[group.id] || []).includes(opt.id);
+                          return (
+                            <label
+                              key={opt.id}
+                              className={`flex items-center justify-between p-2.5 rounded-xl border cursor-pointer transition-all ${
+                                isChecked ? "bg-amber-50/60 border-amber-300" : "bg-stone-50 border-stone-200 hover:bg-stone-100"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type={group.max_select === 1 ? "radio" : "checkbox"}
+                                  name={`modifier-${group.id}`}
+                                  checked={isChecked}
+                                  onChange={(e) => {
+                                    if (group.max_select === 1) {
+                                      setSelectedOptions(prev => ({ ...prev, [group.id]: [opt.id] }));
+                                    } else {
+                                      setSelectedOptions(prev => {
+                                        const curr = prev[group.id] || [];
+                                        if (e.target.checked) {
+                                          if (group.max_select && curr.length >= group.max_select) {
+                                            alert(`You can only select up to ${group.max_select} options`);
+                                            return prev;
+                                          }
+                                          return { ...prev, [group.id]: [...curr, opt.id] };
+                                        } else {
+                                          return { ...prev, [group.id]: curr.filter(id => id !== opt.id) };
+                                        }
+                                      });
+                                    }
+                                  }}
+                                  className={`text-amber-600 focus:ring-amber-500 ${group.max_select === 1 ? "" : "rounded"}`}
+                                />
+                                <span className="text-xs font-bold text-stone-800">{opt.name}</span>
+                              </div>
+                              <span className="text-xs font-mono font-bold text-stone-600">{opt.price_delta_paise > 0 ? `+${paise(opt.price_delta_paise)}` : ""}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
 
               {/* Cooking Instructions */}
               <div>
@@ -1314,9 +1273,19 @@ export default function PublicCafeClient({
             {/* Bottom Add Action */}
             <div className="p-4 border-t border-stone-200 bg-stone-50 shrink-0 pb-safe">
               {(() => {
-                const portionPaise = selectedPortion === "Full" ? Math.round(customizingItem.price_paise * 0.4) : 0;
-                const addOnsPaise = selectedAddOns.reduce((sum, a) => sum + a.pricePaise, 0);
-                const linePrice = customizingItem.price_paise + portionPaise + addOnsPaise;
+                const itemModLinks = itemModifiers?.filter((m: any) => m.menu_item_id === customizingItem.id) || [];
+                const itemGroups = modifierGroups?.filter((g: any) => itemModLinks.some((l: any) => l.modifier_group_id === g.id)) || [];
+                let optionsTotalPaise = 0;
+                for (const g of itemGroups) {
+                  const selectedIds = selectedOptions[g.id] || [];
+                  for (const optId of selectedIds) {
+                    const opt = g.modifier_options?.find((o: any) => o.id === optId);
+                    if (opt) {
+                      optionsTotalPaise += opt.price_delta_paise;
+                    }
+                  }
+                }
+                const linePrice = customizingItem.price_paise + optionsTotalPaise;
 
                 return (
                   <button
@@ -1378,8 +1347,8 @@ export default function PublicCafeClient({
                 <>
                   <div className="space-y-2.5">
                     {cartLines.map((line) => {
-                      const addOnsSum = line.selectedAddOns.reduce((sum, a) => sum + a.pricePaise, 0);
-                      const unitPrice = line.item.price_paise + line.portionExtraPaise + addOnsSum;
+                      const optionsSum = line.selectedOptions.reduce((sum, opt) => sum + opt.pricePaise, 0);
+                      const unitPrice = line.item.price_paise + optionsSum;
 
                       return (
                         <div
@@ -1396,21 +1365,15 @@ export default function PublicCafeClient({
                               <h4 className="text-xs sm:text-sm font-black text-stone-900 truncate">
                                 {line.item.name}
                               </h4>
-                              {line.portion !== "Regular" && (
-                                <span className="text-[10px] font-bold px-1.5 py-0.2 bg-amber-100 text-amber-900 rounded">
-                                  {line.portion}
-                                </span>
-                              )}
                             </div>
 
                             <div className="text-[11px] text-stone-500 mt-0.5 space-y-0.5">
                               <div>{paise(unitPrice)} each</div>
-                              {line.selectedAddOns.length > 0 && (
+                              {line.selectedOptions.length > 0 && (
                                 <div className="text-stone-600 text-[10px]">
-                                  + {line.selectedAddOns.map((a) => a.name).join(", ")}
+                                  + {line.selectedOptions.map((opt) => opt.optionName).join(", ")}
                                 </div>
                               )}
-                              {line.spiceLevel && <span>• {line.spiceLevel} </span>}
                               {line.notes && <span>• "{line.notes}"</span>}
                             </div>
                           </div>

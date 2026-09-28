@@ -17,11 +17,10 @@ export interface CommunicationMessage {
   latest_event?: { event_type: string; created_at: string } | null;
 }
 
-type ChannelFilter = "all" | "whatsapp" | "email" | "sms";
+type ChannelFilter = "all" | "email" | "sms";
 
 const CHANNEL_TABS: { id: ChannelFilter; label: string }[] = [
   { id: "all", label: "All" },
-  { id: "whatsapp", label: "WhatsApp" },
   { id: "email", label: "Email" },
   { id: "sms", label: "SMS" },
 ];
@@ -58,8 +57,6 @@ export function CommunicationsTab({
   flash?: (kind: "ok" | "err", msg: string) => void;
   userRole?: string;
 }) {
-  // Mirrors POST /api/whatsapp/send owner-only gate (403 for staff/manager):
-  // non-privileged roles get a read-only view with no Resend button.
   const canResend = userRole === "owner" || userRole === "super_admin";
   const [channel, setChannel] = useState<ChannelFilter>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -98,11 +95,6 @@ export function CommunicationsTab({
   }, [channel, statusFilter]);
 
   useEffect(() => {
-    if (channel === "email" || channel === "sms") {
-      setLoading(false);
-      setMessages([]);
-      return;
-    }
     loadMessages();
   }, [channel, loadMessages]);
 
@@ -113,12 +105,14 @@ export function CommunicationsTab({
     }
     setResendingId(msg.id);
     try {
-      const res = await fetch("/api/whatsapp/send", {
+      // Generic resend — uses the admin communications API
+      const res = await fetch("/api/admin/communications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           order_id: msg.order_id,
           phone: msg.recipient_phone,
+          type: channel === "email" ? "email" : "sms",
         }),
       });
       const data = await res.json();
@@ -138,7 +132,7 @@ export function CommunicationsTab({
         <div>
           <h2 className="text-lg font-black text-slate-900">Communication History</h2>
           <p className="text-xs text-slate-500 font-medium">
-            WhatsApp message delivery log with resend for failed sends.
+            Communication delivery history and resend status.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -182,7 +176,7 @@ export function CommunicationsTab({
             {channel === "email" ? "Email" : "SMS"} communications coming soon
           </p>
           <p className="text-xs text-slate-500">
-            Only WhatsApp history is available right now. New channels will appear here when enabled.
+            Communication history will appear here after messages are sent.
           </p>
         </div>
       )}
@@ -195,7 +189,7 @@ export function CommunicationsTab({
             <p className="p-6 text-xs text-red-600 font-bold">{error}</p>
           ) : messages.length === 0 ? (
             <p className="p-6 text-xs text-slate-500 font-medium">
-              No messages yet. WhatsApp sends will appear here after the first bill is delivered.
+              No messages yet. Communication will appear here after the first send.
             </p>
           ) : (
             <div className="overflow-x-auto">
@@ -253,35 +247,35 @@ export function CommunicationsTab({
                               </button>
                             )}
                           </div>
-                        </td>
-                      </tr>
-                      {expandedId === m.id && (
-                        <tr className="border-t border-slate-100 bg-slate-50/70">
-                          <td colSpan={6} className="px-4 py-3">
-                            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-[11px] text-slate-600">
-                              <div className="flex gap-2">
-                                <dt className="font-bold text-slate-500">Message ID:</dt>
-                                <dd className="font-mono break-all">{m.id}</dd>
-                              </div>
-                              <div className="flex gap-2">
-                                <dt className="font-bold text-slate-500">Latest event:</dt>
-                                <dd>
-                                  {m.latest_event
-                                    ? `${formatStatus(m.latest_event.event_type)} · ${formatDate(m.latest_event.created_at)}`
-                                    : "—"}
-                                </dd>
-                              </div>
-                              {m.error_message && (
-                                <div className="flex gap-2 sm:col-span-2">
-                                  <dt className="font-bold text-red-500">Error:</dt>
-                                  <dd className="text-red-600">{m.error_message}</dd>
-                                </div>
-                              )}
-                            </dl>
                           </td>
                         </tr>
-                      )}
-                    </React.Fragment>
+                        {expandedId === m.id && (
+                          <tr className="border-t border-slate-100 bg-slate-50/70">
+                            <td colSpan={6} className="px-4 py-3">
+                              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-[11px] text-slate-600">
+                                <div className="flex gap-2">
+                                  <dt className="font-bold text-slate-500">Message ID:</dt>
+                                  <dd className="font-mono break-all">{m.id}</dd>
+                                </div>
+                                <div className="flex gap-2">
+                                  <dt className="font-bold text-slate-500">Latest event:</dt>
+                                  <dd>
+                                    {m.latest_event
+                                      ? `${formatStatus(m.latest_event.event_type)} · ${formatDate(m.latest_event.created_at)}`
+                                      : "—"}
+                                  </dd>
+                                </div>
+                                {m.error_message && (
+                                  <div className="flex gap-2 sm:col-span-2">
+                                    <dt className="font-bold text-red-500">Error:</dt>
+                                    <dd className="text-red-600">{m.error_message}</dd>
+                                  </div>
+                                )}
+                              </dl>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                   ))}
                 </tbody>
               </table>

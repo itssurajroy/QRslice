@@ -283,7 +283,7 @@ export function PosCartDrawer({
                 <div className="font-bold text-slate-900 truncate">{ci.item.name}</div>
                 <div className="text-xs text-slate-500 font-mono mt-0.5">
                   {paise(ci.item.price_paise)} × {ci.quantity} ={" "}
-                  <span className="text-indigo-600 font-bold">
+                  <span className="text-brand font-bold">
                     {paise(ci.item.price_paise * ci.quantity)}
                   </span>
                 </div>
@@ -303,7 +303,7 @@ export function PosCartDrawer({
                 <button
                   type="button"
                   onClick={() => updateQty(ci.item.id, 1)}
-                  className="w-11 h-11 min-h-[44px] min-w-[44px] rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black flex items-center justify-center cursor-pointer transition-all active:scale-95 text-base shadow-sm"
+                  className="w-11 h-11 min-h-[44px] min-w-[44px] rounded-xl bg-brand hover:bg-brand-dark text-white font-black flex items-center justify-center cursor-pointer transition-all active:scale-95 text-base shadow-sm"
                 >
                   +
                 </button>
@@ -353,7 +353,7 @@ export function PosCartDrawer({
             placeholder="e.g. 27AAAAA0000A1Z5"
             value={customerGstin}
             onChange={(e) => setCustomerGstin?.(e.target.value)}
-            className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900 font-mono uppercase focus:outline-none focus:border-indigo-500 font-bold"
+            className="w-full bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs text-slate-900 font-mono uppercase focus:outline-none focus:border-brand font-bold"
           />
         </div>
 
@@ -389,7 +389,7 @@ export function PosCartDrawer({
               placeholder="Customer Phone (e.g. 9876543210)"
               value={customerPhone || ""}
               onChange={(e) => setCustomerPhone?.(e.target.value)}
-              className="flex-1 bg-white border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:border-indigo-500"
+              className="flex-1 bg-white border border-slate-200 rounded-xl p-2 text-xs focus:outline-none focus:border-brand"
             />
             <button
               type="button"
@@ -402,17 +402,19 @@ export function PosCartDrawer({
           </div>
           
           {customerPoints !== null && customerPoints !== undefined && (
-            <div className="mt-2 p-2.5 bg-indigo-50 border border-indigo-100 rounded-xl">
+            <div className="mt-2 p-2.5 bg-brand-lavender border border-indigo-100 rounded-xl">
               <div className="flex justify-between items-center text-xs">
                 <span className="font-bold text-indigo-900">Available Points: {customerPoints}</span>
                 {customerPoints > 0 && (
-                  <span className="text-indigo-600 font-semibold">1 pt = ₹1</span>
+                  <span className="text-brand font-semibold">1 pt = ₹1</span>
                 )}
               </div>
               
               {customerPoints > 0 && (
                 <div className="mt-2">
+                  <label htmlFor="redeem-points" className="sr-only">Points to redeem</label>
                   <input
+                    id="redeem-points"
                     type="range"
                     min="0"
                     max={Math.min(customerPoints, Math.floor(subtotalPaise * 0.25 / 100))}
@@ -420,7 +422,7 @@ export function PosCartDrawer({
                     onChange={(e) => setRedeemPoints?.(Number(e.target.value))}
                     className="w-full accent-indigo-600 cursor-pointer"
                   />
-                  <div className="flex justify-between text-[10px] text-indigo-700 mt-1 font-medium">
+                  <div className="flex justify-between text-[10px] text-brand-dark mt-1 font-medium">
                     <span>Redeeming: {redeemPoints || 0} pts</span>
                     <span>Max: {Math.min(customerPoints, Math.floor(subtotalPaise * 0.25 / 100))} pts (25% cap)</span>
                   </div>
@@ -664,16 +666,16 @@ export function PosCartDrawer({
         )}
 
         {paymentMethod === "upi" && !isSplitTender && (
-          <div className="p-3 bg-indigo-50/70 border border-indigo-100 rounded-2xl space-y-1.5 text-xs animate-in fade-in">
+          <div className="p-3 bg-brand-lavender/70 border border-indigo-100 rounded-2xl space-y-1.5 text-xs animate-in fade-in">
             <div className="flex items-center justify-between text-indigo-900 font-bold">
               <span className="flex items-center gap-1.5">
                 <span>⚡ UPI Dynamic Counter</span>
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 text-[10px] font-mono">
+              <span className="px-2 py-0.5 rounded-full bg-brand-lavender text-indigo-800 text-[10px] font-mono">
                 Scan & Pay
               </span>
             </div>
-            <p className="text-[11px] text-indigo-700 leading-snug">
+            <p className="text-[11px] text-brand-dark leading-snug">
               Instruct customer to scan cafe QR code for ₹{(finalTotalPaise / 100).toFixed(2)}. Verify cashier receipt / soundbox before clicking Pay.
             </p>
           </div>

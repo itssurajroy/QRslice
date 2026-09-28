@@ -99,7 +99,7 @@ export function WebhooksTab({ restaurant, flash }: WebhooksTabProps) {
             Connect third-party POS systems, Zomato / Swiggy menu sync & real-time webhook event dispatchers.
           </p>
         </div>
-        <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-indigo-50 text-indigo-600 border border-indigo-200">
+        <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-brand-lavender text-brand border border-brand-lavender">
           Pro & Enterprise API
         </span>
       </div>
@@ -115,7 +115,7 @@ export function WebhooksTab({ restaurant, flash }: WebhooksTabProps) {
               <button
                 type="button"
                 onClick={handleGenerateApiKey}
-                className="text-xs font-bold text-indigo-600 hover:underline cursor-pointer"
+                className="text-xs font-bold text-brand hover:underline cursor-pointer"
               >
                 ↻ Generate New Key
               </button>
@@ -138,7 +138,7 @@ export function WebhooksTab({ restaurant, flash }: WebhooksTabProps) {
               </button>
             </div>
             <p className="text-[11px] text-slate-400">
-              Pass this key as <code className="bg-slate-100 px-1 py-0.5 rounded text-indigo-600">Bearer {"<"}key{">"}</code> header to authenticate with <code className="font-mono">/api/orders</code> or <code className="font-mono">/api/menu</code>.
+              Pass this key as <code className="bg-slate-100 px-1 py-0.5 rounded text-brand">Bearer {"<"}key{">"}</code> header to authenticate with <code className="font-mono">/api/orders</code> or <code className="font-mono">/api/menu</code>.
             </p>
           </div>
 
@@ -154,7 +154,7 @@ export function WebhooksTab({ restaurant, flash }: WebhooksTabProps) {
               placeholder="https://your-server.com/api/qrslice-webhook"
               value={webhookUrl}
               onChange={(e) => setWebhookUrl(e.target.value)}
-              className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono"
+              className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand focus:ring-1 focus:ring-indigo-500 font-mono"
             />
             <p className="text-[11px] text-slate-400">
               We send signed JSON payloads for events like <code className="font-mono text-slate-600">order.placed</code>, <code className="font-mono text-slate-600">order.settled</code>, and <code className="font-mono text-slate-600">payment.confirmed</code>.
@@ -193,7 +193,7 @@ export function WebhooksTab({ restaurant, flash }: WebhooksTabProps) {
             <button
               type="submit"
               disabled={isSaving}
-              className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs rounded-xl shadow-md shadow-indigo-600/20 cursor-pointer transition-all disabled:opacity-50"
+              className="px-6 py-3 bg-brand hover:bg-brand-dark text-white font-black text-xs rounded-xl shadow-md shadow-brand/20 cursor-pointer transition-all disabled:opacity-50"
             >
               {isSaving ? "Saving Settings..." : "Save Webhook Configuration"}
             </button>

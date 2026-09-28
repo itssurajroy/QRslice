@@ -113,6 +113,7 @@ export default async function TablePage({
       items={items ?? []}
       accentColor={tenant.accent_color || undefined}
       upiQrUrl={tenant.upi_qr_url || undefined}
+      upiId={tenant.upi_id || undefined}
     />
   );
 }

@@ -216,7 +216,7 @@ export default function CookiePolicyPage() {
                 Email:{" "}
                 <a
                   href="mailto:privacy@qrslice.com"
-                  className="text-indigo-600 hover:underline"
+                  className="text-brand hover:underline"
                 >
                   privacy@qrslice.com
                 </a>
@@ -225,7 +225,7 @@ export default function CookiePolicyPage() {
                 Email:{" "}
                 <a
                   href="mailto:support@qrslice.com"
-                  className="text-indigo-600 hover:underline"
+                  className="text-brand hover:underline"
                 >
                   support@qrslice.com
                 </a>

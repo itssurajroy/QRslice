@@ -104,7 +104,7 @@ export default function PrivacyPolicyPage() {
               </li>
               <li>
                 <strong>Cookies and Similar Technologies:</strong> See our{" "}
-                <Link href="/legal/cookies" className="text-indigo-600 hover:underline">
+                <Link href="/legal/cookies" className="text-brand hover:underline">
                   Cookie Policy
                 </Link>{" "}
                 for details.
@@ -217,7 +217,7 @@ export default function PrivacyPolicyPage() {
               To exercise these rights, contact us at{" "}
               <a
                 href="mailto:privacy@qrslice.com"
-                className="text-indigo-600 hover:underline"
+                className="text-brand hover:underline"
               >
                 privacy@qrslice.com
               </a>
@@ -285,7 +285,7 @@ export default function PrivacyPolicyPage() {
                 Email:{" "}
                 <a
                   href="mailto:privacy@qrslice.com"
-                  className="text-indigo-600 hover:underline"
+                  className="text-brand hover:underline"
                 >
                   privacy@qrslice.com
                 </a>
@@ -294,7 +294,7 @@ export default function PrivacyPolicyPage() {
                 Email:{" "}
                 <a
                   href="mailto:support@qrslice.com"
-                  className="text-indigo-600 hover:underline"
+                  className="text-brand hover:underline"
                 >
                   support@qrslice.com
                 </a>

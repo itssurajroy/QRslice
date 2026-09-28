@@ -24,7 +24,6 @@ import { OrdersTab, type OrderData } from "@/features/admin/tabs/OrdersTab";
 import { ModifiersTab } from "@/features/admin/tabs/ModifiersTab";
 import { StaffTab } from "@/features/admin/tabs/StaffTab";
 import { CrmTab } from "@/features/admin/tabs/CrmTab";
-import { CommunicationsTab } from "@/features/admin/tabs/CommunicationsTab";
 import { AccountTab } from "@/features/admin/tabs/AccountTab";
 import { IntegrationsTab } from "@/features/admin/tabs/IntegrationsTab";
 import { AdminAppShell, type AdminSectionId } from "@/components/shell/AdminAppShell";
@@ -35,6 +34,8 @@ import type { Category, MenuItem as Item, Table } from "@/types";
 import { speakHumanVoice } from "@/lib/tts";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { canAccessTab, getDefaultTabForRole } from "@/lib/role-permissions";
+import { getTierLimits } from "@/lib/tier-limits";
+import { UpgradeRequired } from "@/components/UpgradeRequired";
 
 type Report = { orders: number; paid: number; revenue: number; avg: number };
 
@@ -124,6 +125,8 @@ export default function AdminClient({
     return initial as AdminSectionId | AdminTabId;
   });
 
+  const tierLimits = getTierLimits(activeRestaurant.tier);
+
   useEffect(() => {
     const handlePopState = () => {
       const urlTab = new URLSearchParams(window.location.search).get("tab");
@@ -196,6 +199,9 @@ export default function AdminClient({
   const [newItemCatId, setNewItemCatId] = useState(categories[0]?.id || "");
   const [newItemDesc, setNewItemDesc] = useState("");
   const [newItemVeg, setNewItemVeg] = useState(true);
+  const [newItemBestseller, setNewItemBestseller] = useState(false);
+  const [newItemSpiceIndex, setNewItemSpiceIndex] = useState(0);
+  const [newItemTags, setNewItemTags] = useState("");
   const [newItemImageFile, setNewItemImageFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -419,6 +425,8 @@ export default function AdminClient({
         const fileExt = newItemImageFile.name.split('.').pop();
         const fileName = `${restaurantId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
         
+        // TODO: Register a DMCA Designated Agent with the U.S. Copyright Office ($6 fee) to limit statutory damages.
+        // Ensure upload flows reference copyright policies.
         const { error: uploadError } = await supabase.storage
           .from("images")
           .upload(fileName, newItemImageFile);
@@ -444,6 +452,9 @@ export default function AdminClient({
           pricePaise: Math.round(priceNum * 100),
           description: newItemDesc.trim(),
           isVeg: newItemVeg,
+          isBestseller: newItemBestseller,
+          spiceIndex: newItemSpiceIndex,
+          tags: newItemTags.split(',').map(t => t.trim()).filter(Boolean),
           imageUrl: uploadedUrl,
         }),
       });
@@ -454,6 +465,9 @@ export default function AdminClient({
       setNewItemPrice("");
       setNewItemDesc("");
       setNewItemImageFile(null);
+      setNewItemBestseller(false);
+      setNewItemSpiceIndex(0);
+      setNewItemTags("");
       setShowItemModal(false);
       flash("ok", "Menu item added successfully!");
     } catch (err) {
@@ -849,7 +863,7 @@ export default function AdminClient({
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm shadow-md shadow-indigo-600/25">🚀</span>
+                  <span className="w-8 h-8 rounded-xl bg-brand text-white flex items-center justify-center text-sm shadow-md shadow-brand/25">🚀</span>
                   <div>
                     <h3 className="font-extrabold text-sm text-slate-900">Café Launch Checklist</h3>
                     <p className="text-[11px] text-slate-500 font-medium">{doneCount === 2 ? "All set — you're live! 🎉" : `${doneCount} of 2 setup steps complete`}</p>
@@ -877,7 +891,7 @@ export default function AdminClient({
                   </span>
                   <span className="text-slate-700 font-semibold">Generate Tables & QRs ({tableList.length})</span>
                 </div>
-                <Link href={restaurant?.slug ? `/c/${restaurant.slug}` : "/"} className="flex items-center gap-2.5 p-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 border border-indigo-600 transition-colors group">
+                <Link href={restaurant?.slug ? `/c/${restaurant.slug}` : "/"} className="flex items-center gap-2.5 p-3 rounded-2xl bg-brand hover:bg-brand-dark border border-brand transition-colors group">
                   <span className="w-6 h-6 rounded-full bg-white/20 text-white flex items-center justify-center text-xs font-black shrink-0">★</span>
                   <span className="text-white font-bold">
                     Test Guest Menu <span className="inline-block transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
@@ -937,13 +951,19 @@ export default function AdminClient({
 
         {/* TAB: CRM & LOYALTY */}
         {tab === "crm" && (
-          <CrmTab flash={flash} />
+          <div className="animate-fade-in-up space-y-6">
+            {!tierLimits.crm ? (
+              <UpgradeRequired featureName="Customer Engagement Hub" requiredTier="enterprise" />
+            ) : (
+              <CrmTab flash={flash} />
+            )}
+          </div>
         )}
 
-        {/* TAB: COMMUNICATIONS HISTORY (WhatsApp) */}
-        {tab === "communications" && (
-          <CommunicationsTab flash={flash} userRole={userRole} />
-        )}
+        {/* TAB: COMMUNICATIONS (WhatsApp) Removed */}
+
+        {/* TAB: INBOX (B3 handoff) */}
+        
 
         {/* TAB 1: MENU & CATEGORY MANAGEMENT */}
         {(tab === "menu" || tab === "categories") && (
@@ -1007,32 +1027,43 @@ export default function AdminClient({
         {/* TAB 4: ADVANCED FLOOR INTELLIGENCE & ANALYTICS */}
         {(tab === "analytics" || tab === "report") && (
           <div className="animate-fade-in-up space-y-6">
-            <FloorIntelligence
-              loadingAnalytics={loadingAnalytics}
-              analytics={analytics}
-              loadAnalytics={loadAnalytics}
-            />
-            <ReportSummary report={report} />
+            {!tierLimits.analytics ? (
+              <UpgradeRequired featureName="Advanced Analytics" requiredTier="pro" />
+            ) : (
+              <>
+                <FloorIntelligence
+                  loadingAnalytics={loadingAnalytics}
+                  analytics={analytics}
+                  loadAnalytics={loadAnalytics}
+                />
+                <ReportSummary report={report} />
+              </>
+            )}
           </div>
         )}
 
         {/* TAB 5: CUSTOM BRANDING (PRO ONLY) */}
         {tab === "branding" && (
           <div className="animate-fade-in-up">
-            <BrandingTab
-              brandingLogoUrl={brandingLogoUrl}
-              brandingTagline={brandingTagline}
-              brandingGoogleReviewUrl={brandingGoogleReviewUrl}
-              brandingAccentColor={brandingAccentColor}
-              savingBranding={savingBranding}
-              setBrandingLogoUrl={setBrandingLogoUrl}
-              setBrandingTagline={setBrandingTagline}
-              setBrandingGoogleReviewUrl={setBrandingGoogleReviewUrl}
-              setBrandingAccentColor={setBrandingAccentColor}
-              handleSaveBranding={handleSaveBranding}
-            />
+            {!tierLimits.branding ? (
+              <UpgradeRequired featureName="Custom Branding" requiredTier="pro" />
+            ) : (
+              <BrandingTab
+                brandingLogoUrl={brandingLogoUrl}
+                brandingTagline={brandingTagline}
+                brandingGoogleReviewUrl={brandingGoogleReviewUrl}
+                brandingAccentColor={brandingAccentColor}
+                savingBranding={savingBranding}
+                setBrandingLogoUrl={setBrandingLogoUrl}
+                setBrandingTagline={setBrandingTagline}
+                setBrandingGoogleReviewUrl={setBrandingGoogleReviewUrl}
+                setBrandingAccentColor={setBrandingAccentColor}
+                handleSaveBranding={handleSaveBranding}
+              />
+            )}
           </div>
         )}
+
 
         {/* TAB: OWNER ACCOUNT CONTROL CENTER */}
         {tab === "account" && (
@@ -1094,7 +1125,7 @@ export default function AdminClient({
                   Subscription controls, multi-tenant governance, Google Review setup &amp; hardware diagnostics
                 </p>
               </div>
-              <span className="px-3 py-1 rounded-full text-xs font-black uppercase bg-indigo-600 text-slate-900">
+              <span className="px-3 py-1 rounded-full text-xs font-black uppercase bg-brand text-slate-900">
                 Operational Runbook
               </span>
             </div>
@@ -1102,11 +1133,11 @@ export default function AdminClient({
             {/* 1. INTERACTIVE 1-CLICK SYSTEM DIAGNOSTICS */}
             <div className="p-5 rounded-3xl bg-slate-50 border border-amber-500/30 space-y-4 shadow-inner">
               <div>
-                <h3 className="text-sm font-black text-indigo-600 uppercase tracking-wider flex items-center gap-2">
+                <h3 className="text-sm font-black text-brand uppercase tracking-wider flex items-center gap-2">
                   <span>🛠️ Live Floor &amp; Hardware Self-Diagnostics</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Test your browser audio, WhatsApp URL encoding, and tax calculations before operating live.
+                  Test your browser audio and tax calculations before operating live.
                 </p>
               </div>
 
@@ -1125,31 +1156,7 @@ export default function AdminClient({
                   <div className="text-xs text-slate-400 font-mono">Speak: Table 01 Call</div>
                 </button>
 
-                {/* Test 2: WhatsApp Link Test */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    const sampleMsg = `🧾 *TEST RECEIPT: ${restaurant?.name || "QRslice"}*\n` +
-                      `Bill: #POS-TEST | Date: ${new Date().toLocaleDateString("en-IN")}\n` +
-                      `• Hazelnut Cold Brew x1 = ₹220.00\n` +
-                      `• Truffle Pizza x1 = ₹380.00\n` +
-                      `---------------------------------\n` +
-                      `Subtotal: ₹600.00\n` +
-                      `GST (5%): ₹30.00\n` +
-                      `*TOTAL: ₹630.00* (PAID IN CASH)\n` +
-                      `Loyalty Points: +6 pts\n` +
-                      `---------------------------------\n` +
-                      `Thank you for dining with us! 🙏`;
-                    window.open(`https://wa.me/?text=${encodeURIComponent(sampleMsg)}`, "_blank");
-                    flash("ok", "💬 WhatsApp Test Receipt Dispatched!");
-                  }}
-                  className="p-3 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200 text-left space-y-1.5 transition-all cursor-pointer group"
-                >
-                  <span className="text-xl block group-hover:scale-110 transition-transform">💬</span>
-                  <div className="text-xs font-bold text-emerald-600">Test WhatsApp Bill</div>
-                  <div className="text-xs text-slate-400 font-mono">Launch pre-formatted text</div>
-                </button>
-
+                {/* WhatsApp test removed */}
                 {/* Test 3: GST Tax Calculation */}
                 <button
                   type="button"
@@ -1165,7 +1172,7 @@ export default function AdminClient({
                   className="p-3 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200 text-left space-y-1.5 transition-all cursor-pointer group"
                 >
                   <span className="text-xl block group-hover:scale-110 transition-transform">🧮</span>
-                  <div className="text-xs font-bold text-indigo-600">Verify GST Math</div>
+                  <div className="text-xs font-bold text-brand">Verify GST Math</div>
                   <div className="text-xs text-slate-400 font-mono">Compute 2.5% CGST/SGST</div>
                 </button>
 
@@ -1198,7 +1205,7 @@ export default function AdminClient({
             {/* 2. GOVERNANCE MODULE A: SUBSCRIPTIONS & BILLING */}
             <div className="space-y-3 text-xs">
               <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                <span className="w-6 h-6 rounded-lg bg-brand/20 text-brand flex items-center justify-center font-bold text-xs">
                   A
                 </span>
                 <h3 className="text-sm font-extrabold text-white">Subscription &amp; SaaS Billing Governance</h3>
@@ -1215,13 +1222,13 @@ export default function AdminClient({
                   </div>
                   <div className="p-2 rounded-xl bg-white border border-slate-200">
                     <span className="text-slate-400 block">Trial Expiry / Renewal:</span>
-                    <span className="text-indigo-600 font-bold">{trialEnds ? trialEnds.toLocaleDateString("en-IN") : "Active"}</span>
+                    <span className="text-brand font-bold">{trialEnds ? trialEnds.toLocaleDateString("en-IN") : "Active"}</span>
                   </div>
                 </div>
                 <div className="pt-2">
                   <Link
                     href="/admin/billing"
-                    className="inline-block px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-slate-900 font-black text-xs transition-all shadow-md cursor-pointer"
+                    className="inline-block px-4 py-2 rounded-xl bg-brand hover:bg-brand-dark text-slate-900 font-black text-xs transition-all shadow-md cursor-pointer"
                   >
                     Manage Razorpay Subscription &rarr;
                   </Link>
@@ -1232,7 +1239,7 @@ export default function AdminClient({
             {/* 3. GOVERNANCE MODULE B: MULTI-TENANT FLOOR DEPLOYMENT */}
             <div className="space-y-3 text-xs">
               <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                <span className="w-6 h-6 rounded-lg bg-brand/20 text-brand flex items-center justify-center font-bold text-xs">
                   B
                 </span>
                 <h3 className="text-sm font-extrabold text-white">Floor Deployment &amp; Table QR Stands</h3>
@@ -1253,7 +1260,7 @@ export default function AdminClient({
             {/* 4. GOVERNANCE MODULE C: GOOGLE BUSINESS REVIEW AUTOMATION */}
             <div className="space-y-3 text-xs">
               <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-indigo-600/20 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                <span className="w-6 h-6 rounded-lg bg-brand/20 text-brand flex items-center justify-center font-bold text-xs">
                   C
                 </span>
                 <h3 className="text-sm font-extrabold text-white">Google Business 5★ Review Capture Setup</h3>
@@ -1263,11 +1270,11 @@ export default function AdminClient({
                 <p>
                   To maximize your restaurant&apos;s local Google Maps ranking, set your Google Place Review URL in the <strong>Branding Tab</strong>.
                 </p>
-                <div className="p-3 rounded-xl bg-white border border-slate-200 font-mono text-xs text-indigo-600">
+                <div className="p-3 rounded-xl bg-white border border-slate-200 font-mono text-xs text-brand">
                   Current Review URL: {restaurant?.google_review_url || "Not configured yet (Add in Branding tab)"}
                 </div>
                 <p className="text-slate-500">
-                  Whenever a guest rates their meal 4★ or 5★ on the live order tracker, or receives a WhatsApp bill, they are 1-click routed directly to leave a 5-star Google review.
+                  Whenever a guest rates their meal 4★ or 5★ on the live order tracker, they are 1-click routed directly to leave a 5-star Google review.
                 </p>
               </div>
             </div>
@@ -1336,7 +1343,7 @@ export default function AdminClient({
               <div>
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Dish Name</label>
                 <input
-                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-indigo-500"
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-brand"
                   placeholder="e.g. Hazelnut Iced Latte"
                   value={newItemName}
                   onChange={(e) => setNewItemName(e.target.value)}
@@ -1348,7 +1355,7 @@ export default function AdminClient({
                 <div>
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Price (₹)</label>
                   <input
-                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-indigo-500"
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-brand"
                     placeholder="e.g. 240"
                     type="number"
                     step="0.01"
@@ -1360,7 +1367,7 @@ export default function AdminClient({
                 <div>
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Category</label>
                   <select
-                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-indigo-500"
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-brand"
                     value={newItemCatId}
                     onChange={(e) => setNewItemCatId(e.target.value)}
                   >
@@ -1376,7 +1383,7 @@ export default function AdminClient({
               <div>
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Description (Optional)</label>
                 <input
-                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-indigo-500"
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-brand"
                   placeholder="Freshly brewed espresso with toasted hazelnut syrup"
                   value={newItemDesc}
                   onChange={(e) => setNewItemDesc(e.target.value)}
@@ -1393,8 +1400,9 @@ export default function AdminClient({
                       setNewItemImageFile(e.target.files[0]);
                     }
                   }}
-                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-indigo-500 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-brand file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-brand-lavender file:text-brand hover:file:bg-brand-lavender"
                 />
+                <p className="text-[10px] text-slate-400 mt-1">By uploading, you confirm you own the copyright to this image per our DMCA policy.</p>
               </div>
 
               <label className="flex items-center gap-2 text-xs text-slate-600 font-semibold cursor-pointer pt-1">
@@ -1407,6 +1415,41 @@ export default function AdminClient({
                 <span>🌱 Vegetarian Item</span>
               </label>
 
+              <label className="flex items-center gap-2 text-xs text-slate-600 font-semibold cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={newItemBestseller}
+                  onChange={(e) => setNewItemBestseller(e.target.checked)}
+                  className="w-4 h-4 accent-[#5738F5] rounded"
+                />
+                <span>👑 Mark as Bestseller / Chef's Pick</span>
+              </label>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Spice Level</label>
+                  <select
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-brand"
+                    value={newItemSpiceIndex}
+                    onChange={(e) => setNewItemSpiceIndex(Number(e.target.value))}
+                  >
+                    <option value={0}>Mild (0)</option>
+                    <option value={1}>Medium (1 🌶️)</option>
+                    <option value={2}>Spicy (2 🌶️🌶️)</option>
+                    <option value={3}>Extra Spicy (3 🌶️🌶️🌶️)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Tags (Comma Sep)</label>
+                  <input
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-brand"
+                    placeholder="e.g. Vegan, Gluten-Free"
+                    value={newItemTags}
+                    onChange={(e) => setNewItemTags(e.target.value)}
+                  />
+                </div>
+              </div>
+
               <div className="flex gap-2 pt-2">
                 <button
                   type="button"
@@ -1418,7 +1461,7 @@ export default function AdminClient({
                 <button
                   type="submit"
                   disabled={isUploading}
-                  className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-slate-900 font-black text-xs shadow-md shadow-indigo-600/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-slate-900 font-black text-xs shadow-md shadow-brand/20 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isUploading ? "Uploading..." : "Save Item"}
                 </button>
@@ -1449,7 +1492,7 @@ export default function AdminClient({
               <div>
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">Category Name</label>
                 <input
-                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-indigo-500"
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 w-full focus:outline-none focus:border-brand"
                   placeholder="e.g. Artisanal Breads & Toasts"
                   value={newCatName}
                   onChange={(e) => setNewCatName(e.target.value)}
@@ -1467,7 +1510,7 @@ export default function AdminClient({
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-slate-900 font-black text-xs shadow-md shadow-indigo-600/20 cursor-pointer"
+                  className="flex-1 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-slate-900 font-black text-xs shadow-md shadow-brand/20 cursor-pointer"
                 >
                   Create
                 </button>
@@ -1517,7 +1560,7 @@ Avocado Sourdough Toast, 240, Breakfast, Veg, Smashed hass avocado on artisan so
 Double Chocolate Brownie, 180, Desserts, Veg, Warm fudgy chocolate brownie with ganache`;
                     handleBulkParse(sample);
                   }}
-                  className="text-xs text-indigo-600 font-bold hover:underline cursor-pointer"
+                  className="text-xs text-brand font-bold hover:underline cursor-pointer"
                 >
                   ⚡ Load 6 Sample Dishes
                 </button>
@@ -1528,7 +1571,7 @@ Double Chocolate Brownie, 180, Desserts, Veg, Warm fudgy chocolate brownie with 
                 value={bulkMenuText}
                 onChange={(e) => handleBulkParse(e.target.value)}
                 placeholder="Hazelnut Cold Brew, 220, Coffee, Veg, Espresso and milk&#10;Truffle Pizza, 380, Food, Veg, Crispy sourdough pizza"
-                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs text-slate-900 font-mono focus:outline-none focus:border-indigo-500"
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs text-slate-900 font-mono focus:outline-none focus:border-brand"
               ></textarea>
 
               {/* Live Parsed Preview Table */}
@@ -1545,7 +1588,7 @@ Double Chocolate Brownie, 180, Desserts, Veg, Warm fudgy chocolate brownie with 
                           <span className="font-bold text-white">{item.name}</span>
                           <span className="text-xs text-slate-400 font-mono">({item.category})</span>
                         </div>
-                        <span className="text-indigo-600 font-mono font-bold">₹{item.price}</span>
+                        <span className="text-brand font-mono font-bold">₹{item.price}</span>
                       </div>
                     ))}
                   </div>
@@ -1608,7 +1651,7 @@ Double Chocolate Brownie, 180, Desserts, Veg, Warm fudgy chocolate brownie with 
                     });
                   }}
                   disabled={generatingBulk}
-                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow-md cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white font-black text-xs shadow-md cursor-pointer disabled:opacity-50"
                 >
                   {generatingBulk ? "Generating Cards..." : "Print All Stand Cards 🖨️"}
                 </button>

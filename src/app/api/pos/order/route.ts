@@ -371,7 +371,23 @@ export async function POST(req: NextRequest) {
       ? idempotency_key
       : null) || crypto.randomUUID();
 
-  let resolvedTableId = table_id || null;
+  let resolvedTableId = null;
+  if (table_id) {
+    const { data: requestedTable } = await admin
+      .from("restaurant_tables")
+      .select("id")
+      .eq("id", table_id)
+      .eq("restaurant_id", user.restaurantId)
+      .maybeSingle();
+    if (!requestedTable) {
+      return NextResponse.json(
+        { error: "Invalid table selected or table does not belong to this restaurant" },
+        { status: 400 },
+      );
+    }
+    resolvedTableId = requestedTable.id;
+  }
+
   if (!resolvedTableId) {
     const { data: fallbackTable } = await admin
       .from("restaurant_tables")

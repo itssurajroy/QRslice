@@ -130,7 +130,7 @@ export function KdsTab({
           <Link
             href="/pos?view=kitchen"
             target="_blank"
-            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer inline-flex items-center gap-1.5 min-h-[44px]"
+            className="px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-xs shadow-md transition-all cursor-pointer inline-flex items-center gap-1.5 min-h-[44px]"
           >
             <span>Open Fullscreen KDS Monitor ↗</span>
           </Link>
@@ -199,7 +199,7 @@ export function KdsTab({
                       <div key={idx} className="text-xs space-y-0.5">
                         <div className="flex justify-between font-bold text-slate-800">
                           <span>{it.item_name}</span>
-                          <span className="text-indigo-600 font-mono">×{it.quantity}</span>
+                          <span className="text-brand font-mono">×{it.quantity}</span>
                         </div>
                         {Array.isArray(it.modifiers) && it.modifiers.length > 0 && (
                           <div className="text-[11px] text-amber-700 font-medium pl-2 border-l-2 border-amber-300">
@@ -221,7 +221,7 @@ export function KdsTab({
                       <button
                         type="button"
                         onClick={() => updateOrderStatus(t.id, "confirmed")}
-                        className="w-full py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs cursor-pointer shadow-sm"
+                        className="w-full py-2 rounded-xl bg-brand text-white font-bold text-xs cursor-pointer shadow-sm"
                       >
                         Accept Ticket ✓
                       </button>

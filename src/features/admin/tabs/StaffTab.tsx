@@ -219,7 +219,7 @@ export function StaffTab({
         {isOwner ? (
           <button 
             onClick={() => setShowModal(true)}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl shadow-sm transition-colors flex items-center gap-2 cursor-pointer"
+            className="px-4 py-2 bg-brand hover:bg-brand-dark text-white text-sm font-bold rounded-xl shadow-sm transition-colors flex items-center gap-2 cursor-pointer"
           >
             <span>➕</span> Add Team Member
           </button>
@@ -292,7 +292,7 @@ export function StaffTab({
                     <td className="p-4">
                       <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
                         user.role === 'owner' ? 'bg-amber-100 text-amber-700' :
-                        user.role === 'admin' || user.role === 'manager' ? 'bg-indigo-100 text-indigo-700' :
+                        user.role === 'admin' || user.role === 'manager' ? 'bg-brand-lavender text-brand-dark' :
                         'bg-slate-100 text-slate-600'
                       }`}>
                         {user.role === 'admin' ? 'manager' : user.role}
@@ -318,7 +318,7 @@ export function StaffTab({
                           <button
                             type="button"
                             onClick={() => handleSetPin(user)}
-                            className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700 text-[11px] font-bold transition-colors cursor-pointer"
+                            className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-brand-lavender text-slate-600 hover:text-brand-dark text-[11px] font-bold transition-colors cursor-pointer"
                             title="Set 4-digit quick sign-in PIN"
                           >
                             + Set PIN
@@ -406,7 +406,7 @@ export function StaffTab({
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand"
                   placeholder="e.g. John Doe"
                 />
               </div>
@@ -418,7 +418,7 @@ export function StaffTab({
                   type="email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand"
                   placeholder="john@example.com"
                 />
               </div>
@@ -430,7 +430,7 @@ export function StaffTab({
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand"
                   placeholder="••••••••"
                   minLength={6}
                 />
@@ -442,7 +442,7 @@ export function StaffTab({
                 <select
                   value={newRole}
                   onChange={(e) => setNewRole(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand"
                 >
                   <option value="staff">Staff / Server</option>
                   <option value="admin">Manager / Admin</option>
@@ -459,7 +459,7 @@ export function StaffTab({
                   maxLength={4}
                   value={newPin}
                   onChange={(e) => setNewPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 font-mono tracking-widest"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-brand font-mono tracking-widest"
                   placeholder="••••"
                 />
                 <p className="text-[10px] text-slate-400 mt-1">Kitchen and waiter staff use this on shared terminals. Leave blank for no PIN.</p>
@@ -476,7 +476,7 @@ export function StaffTab({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-sm font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
+                  className="flex-1 px-4 py-2 bg-brand hover:bg-brand-dark disabled:opacity-50 text-white text-sm font-bold rounded-xl shadow-sm transition-colors cursor-pointer"
                 >
                   {isSubmitting ? 'Creating...' : 'Create Account'}
                 </button>
@@ -524,7 +524,7 @@ export function StaffTab({
                   autoFocus
                   value={pinModalValue}
                   onChange={(e) => setPinModalValue(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-center text-xl font-mono tracking-widest text-slate-900 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-center text-xl font-mono tracking-widest text-slate-900 focus:outline-none focus:border-brand"
                   placeholder="••••"
                 />
               </div>
@@ -540,7 +540,7 @@ export function StaffTab({
                 <button
                   type="submit"
                   disabled={savingPin || pinModalValue.length !== 4}
-                  className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold text-xs shadow-sm cursor-pointer"
+                  className="flex-1 py-2 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs shadow-sm cursor-pointer"
                 >
                   {savingPin ? "Saving..." : "Save PIN ✓"}
                 </button>

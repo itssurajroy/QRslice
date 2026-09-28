@@ -18,7 +18,7 @@ export function BusinessTypes() {
   return (
     <section className="border-y border-slate-200/80 bg-white py-12 relative overflow-hidden backdrop-blur-xl">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <p className="text-center text-xs font-black text-indigo-600 uppercase tracking-widest">
+        <p className="text-center text-xs font-black text-brand uppercase tracking-widest">
           Tailored for Every Food & Beverage Concept across India 🇮🇳
         </p>
 
@@ -31,7 +31,7 @@ export function BusinessTypes() {
             {[...TYPES, ...TYPES].map((type, i) => (
               <span
                 key={`${type.name}-${i}`}
-                className="flex-shrink-0 flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3 text-xs font-bold text-slate-700 shadow-sm transition-all hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-700"
+                className="flex-shrink-0 flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-3 text-xs font-bold text-slate-700 shadow-sm transition-all hover:border-indigo-300 hover:bg-brand-lavender/50 hover:text-brand-dark"
               >
                 <span className="text-lg">{type.icon}</span>
                 <span>{type.name}</span>

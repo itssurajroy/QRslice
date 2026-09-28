@@ -2,76 +2,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdmin } from "@/lib/supabase/admin";
 import { getSessionUser } from "@/lib/auth";
+import crypto from "crypto";
 
 export async function GET(req: NextRequest) {
   const auth = await getSessionUser();
   if (!auth || auth.role === "super_admin" || !auth.restaurantId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
+
   const db = createSupabaseAdmin();
   const restaurantId = auth.restaurantId;
-  
-  // Fetch modifier groups from platform_config or dedicated table
-  const { data: config } = await db
-    .from("platform_config")
-    .select("key, value")
-    .eq("restaurant_id", restaurantId)
-    .eq("key", "modifier_groups");
-  
-  if (config?.[0]?.value) {
-    return NextResponse.json({ ok: true, groups: config[0].value });
+
+  const { data: groupsData, error: groupsError } = await db
+    .from("modifier_groups")
+    .select("id, name, required, min_select, max_select, modifier_options(id, name, price_delta_paise, active)")
+    .eq("restaurant_id", restaurantId);
+
+  if (groupsError) {
+    return NextResponse.json({ error: groupsError.message }, { status: 500 });
   }
-  
-  // Return defaults if not configured
-  const defaultGroups = [
-    {
-      id: "mod-size",
-      name: "Portion Size",
-      required: true,
-      multi_select: false,
-      options: [
-        { id: "opt-reg", name: "Regular", price_adjustment_paise: 0 },
-        { id: "opt-large", name: "Large", price_adjustment_paise: 6000 },
-        { id: "opt-jumbo", name: "Jumbo / Family Pack", price_adjustment_paise: 12000 },
-      ],
-    },
-    {
-      id: "mod-spice",
-      name: "Spice Level",
-      required: true,
-      multi_select: false,
-      options: [
-        { id: "opt-mild", name: "Mild", price_adjustment_paise: 0 },
-        { id: "opt-med", name: "Medium", price_adjustment_paise: 0 },
-        { id: "opt-hot", name: "Spicy / Desi Hot", price_adjustment_paise: 0 },
-      ],
-    },
-    {
-      id: "mod-extras",
-      name: "Add-ons & Extras",
-      required: false,
-      multi_select: true,
-      options: [
-        { id: "opt-cheese", name: "Extra Mozzarella Cheese", price_adjustment_paise: 4000 },
-        { id: "opt-gravy", name: "Extra Makhani Gravy", price_adjustment_paise: 5000 },
-        { id: "opt-dip", name: "Garlic Mint Mayo Dip", price_adjustment_paise: 2500 },
-      ],
-    },
-    {
-      id: "mod-milk",
-      name: "Milk / Base Option",
-      required: false,
-      multi_select: false,
-      options: [
-        { id: "opt-dairy", name: "Full Cream Milk", price_adjustment_paise: 0 },
-        { id: "opt-oat", name: "Oat Milk (Dairy-Free)", price_adjustment_paise: 3500 },
-        { id: "opt-almond", name: "Almond Milk", price_adjustment_paise: 4000 },
-      ],
-    },
-  ];
-  
-  return NextResponse.json({ ok: true, groups: defaultGroups });
+
+  const groups = groupsData.map((g: any) => ({
+    id: g.id,
+    name: g.name,
+    required: g.required || g.min_select > 0,
+    multi_select: g.max_select > 1,
+    options: (g.modifier_options || []).filter((o: any) => o.active !== false).map((o: any) => ({
+      id: o.id,
+      name: o.name,
+      price_adjustment_paise: o.price_delta_paise,
+    })),
+  }));
+
+  return NextResponse.json({ ok: true, groups });
 }
 
 export async function POST(req: NextRequest) {
@@ -79,106 +42,84 @@ export async function POST(req: NextRequest) {
   if (!auth || auth.role === "super_admin" || !auth.restaurantId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  
+
   const db = createSupabaseAdmin();
   const restaurantId = auth.restaurantId;
-  
+
   try {
     const body = await req.json();
     const { groups } = body;
-    
+
     if (!Array.isArray(groups)) {
       return NextResponse.json({ error: "groups array required" }, { status: 400 });
     }
-    
-    await db
-      .from("platform_config")
-      .upsert({ 
-        key: "modifier_groups", 
-        value: groups, 
-        restaurant_id: restaurantId, 
-        updated_at: new Date().toISOString() 
-      }, { onConflict: "key,restaurant_id" });
-    
+
+    // Process each group
+    for (const group of groups) {
+      const isNewGroup = group.id.startsWith("mod-");
+      const groupId = isNewGroup ? crypto.randomUUID() : group.id;
+
+      if (isNewGroup) {
+        group.id = groupId;
+      }
+
+      await db.from("modifier_groups").upsert({
+        id: groupId,
+        restaurant_id: restaurantId,
+        name: group.name,
+        required: group.required,
+        min_select: group.required ? 1 : 0,
+        max_select: group.multi_select ? 10 : 1,
+      });
+
+      // Update options
+      const existingOptionsRes = await db
+        .from("modifier_options")
+        .select("id")
+        .eq("modifier_group_id", groupId);
+      
+      const existingOptionIds = new Set((existingOptionsRes.data || []).map((o) => o.id));
+
+      for (const opt of group.options) {
+        const isNewOpt = opt.id.startsWith("opt-");
+        const optId = isNewOpt ? crypto.randomUUID() : opt.id;
+        
+        if (isNewOpt) {
+          opt.id = optId;
+        }
+
+        await db.from("modifier_options").upsert({
+          id: optId,
+          modifier_group_id: groupId,
+          name: opt.name,
+          price_delta_paise: opt.price_adjustment_paise,
+          active: true,
+        });
+
+        existingOptionIds.delete(optId);
+      }
+
+      // Delete removed options
+      for (const removedId of existingOptionIds) {
+        await db.from("modifier_options").update({ active: false }).eq("id", removedId);
+      }
+    }
+
+    // Now handle deleted groups: any group in DB for this restaurant not in `groups`
+    const currentGroupsIds = new Set(groups.map((g) => g.id));
+    const allDbGroupsRes = await db.from("modifier_groups").select("id").eq("restaurant_id", restaurantId);
+    if (allDbGroupsRes.data) {
+      for (const dbGroup of allDbGroupsRes.data) {
+        if (!currentGroupsIds.has(dbGroup.id)) {
+          // It was deleted
+          await db.from("modifier_groups").delete().eq("id", dbGroup.id);
+          // (modifier_options should cascade or we can leave them orphaned if constraints allow)
+        }
+      }
+    }
+
     return NextResponse.json({ ok: true, groups });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Failed to save modifiers" }, { status: 500 });
-  }
-}
-
-export async function PATCH(req: NextRequest) {
-  const auth = await getSessionUser();
-  if (!auth || auth.role === "super_admin" || !auth.restaurantId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  
-  const db = createSupabaseAdmin();
-  const restaurantId = auth.restaurantId;
-  
-  try {
-    const body = await req.json();
-    const { groupId, group } = body;
-    
-    // Fetch current groups
-    const { data: config } = await db
-      .from("platform_config")
-      .select("value")
-      .eq("restaurant_id", restaurantId)
-      .eq("key", "modifier_groups")
-      .single();
-    
-    const currentGroups = config?.value ?? [];
-    const updatedGroups = currentGroups.map((g: any) => g.id === groupId ? { ...g, ...group } : g);
-    
-    await db
-      .from("platform_config")
-      .upsert({ 
-        key: "modifier_groups", 
-        value: updatedGroups, 
-        restaurant_id: restaurantId, 
-        updated_at: new Date().toISOString() 
-      }, { onConflict: "key,restaurant_id" });
-    
-    return NextResponse.json({ ok: true, groups: updatedGroups });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to update modifier" }, { status: 500 });
-  }
-}
-
-export async function DELETE(req: NextRequest) {
-  const auth = await getSessionUser();
-  if (!auth || auth.role === "super_admin" || !auth.restaurantId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  
-  const db = createSupabaseAdmin();
-  const restaurantId = auth.restaurantId;
-  
-  try {
-    const groupId = new URL(req.url).searchParams.get("groupId");
-    if (!groupId) return NextResponse.json({ error: "groupId required" }, { status: 400 });
-    
-    const { data: config } = await db
-      .from("platform_config")
-      .select("value")
-      .eq("restaurant_id", restaurantId)
-      .eq("key", "modifier_groups")
-      .single();
-    
-    const currentGroups = config?.value ?? [];
-    const updatedGroups = currentGroups.filter((g: any) => g.id !== groupId);
-    
-    await db
-      .from("platform_config")
-      .upsert({ 
-        key: "modifier_groups", 
-        value: updatedGroups, 
-        restaurant_id: restaurantId, 
-        updated_at: new Date().toISOString() 
-      }, { onConflict: "key,restaurant_id" });
-    
-    return NextResponse.json({ ok: true, groups: updatedGroups });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to delete modifier" }, { status: 500 });
   }
 }

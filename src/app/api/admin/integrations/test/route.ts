@@ -1,8 +1,6 @@
 // Copyright (c) 2026 QRslice. All rights reserved.
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth";
-import { BaileysSessionStore } from "@/integrations/whatsapp/baileys/session-store";
-import { BaileysConnectionManager } from "@/integrations/whatsapp/baileys/connection-manager";
 
 export async function POST(req: NextRequest) {
   const auth = await getSessionUser();

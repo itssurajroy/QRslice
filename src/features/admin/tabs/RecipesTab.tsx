@@ -155,7 +155,7 @@ export function RecipesTab({
             type="button"
             onClick={() => setSubTab("gravies")}
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
-              subTab === "gravies" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-900"
+              subTab === "gravies" ? "bg-white text-brand shadow-sm" : "text-slate-500 hover:text-slate-900"
             }`}
           >
             🥘 Base Gravies
@@ -164,7 +164,7 @@ export function RecipesTab({
             type="button"
             onClick={() => setSubTab("recipes")}
             className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
-              subTab === "recipes" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-900"
+              subTab === "recipes" ? "bg-white text-brand shadow-sm" : "text-slate-500 hover:text-slate-900"
             }`}
           >
             📖 Recipe BOM Mappings
@@ -182,7 +182,7 @@ export function RecipesTab({
             <button
               type="button"
               onClick={() => setShowGravyForm(!showGravyForm)}
-              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-xs shadow-md transition-all cursor-pointer"
             >
               {showGravyForm ? "Cancel" : "+ Log Fresh Batch"}
             </button>
@@ -232,7 +232,7 @@ export function RecipesTab({
               </div>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-brand text-white font-bold text-xs shadow-md cursor-pointer"
               >
                 Save Batch
               </button>
@@ -257,7 +257,7 @@ export function RecipesTab({
                       Fresh Batch
                     </span>
                   </div>
-                  <div className="text-xs font-mono text-indigo-600 font-bold">
+                  <div className="text-xs font-mono text-brand font-bold">
                     {g.quantity_prepared} {g.unit || "Liters"} Prepared
                   </div>
                   <div className="text-[11px] text-slate-400">
@@ -280,7 +280,7 @@ export function RecipesTab({
             <button
               type="button"
               onClick={() => setShowRecipeForm(!showRecipeForm)}
-              className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-brand hover:bg-brand-dark text-white font-bold text-xs shadow-md transition-all cursor-pointer"
             >
               {showRecipeForm ? "Cancel" : "+ Add Recipe Mapping"}
             </button>
@@ -337,7 +337,7 @@ export function RecipesTab({
               </div>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-brand text-white font-bold text-xs shadow-md cursor-pointer"
               >
                 Save Recipe BOM
               </button>
@@ -367,7 +367,7 @@ export function RecipesTab({
                     <tr key={r.id} className="hover:bg-slate-50">
                       <td className="px-4 py-3 font-bold text-slate-900">{r.item_name || "Paneer Tikka"}</td>
                       <td className="px-4 py-3 text-slate-700">{r.ingredient_name || "Paneer"}</td>
-                      <td className="px-4 py-3 font-mono font-bold text-indigo-600">
+                      <td className="px-4 py-3 font-mono font-bold text-brand">
                         {r.quantity_required} {r.unit || "g"}
                       </td>
                     </tr>

@@ -132,7 +132,7 @@ export default function KdsClient({
   };
 
   return (
-    <main className="h-dvh flex flex-col bg-slate-900 text-slate-100 font-sans antialiased overflow-hidden selection:bg-indigo-600 selection:text-white">
+    <main className="h-dvh flex flex-col bg-slate-900 text-slate-100 font-sans antialiased overflow-hidden selection:bg-brand selection:text-white">
       {/* KDS Header */}
       <header className="bg-slate-950 border-b border-slate-800 flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 pt-[max(0.6rem,env(safe-area-inset-top))] shrink-0 shadow-md">
         <div className="flex items-center gap-3">
@@ -174,7 +174,7 @@ export default function KdsClient({
           <button
             type="button"
             onClick={fetchLiveOrders}
-            className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black shadow-lg shadow-indigo-600/30 transition-all active:scale-95 cursor-pointer"
+            className="px-3 py-1.5 rounded-xl bg-brand hover:bg-brand-dark text-white text-xs font-black shadow-lg shadow-brand/30 transition-all active:scale-95 cursor-pointer"
           >
             🔄 Refresh
           </button>
@@ -185,7 +185,7 @@ export default function KdsClient({
       {loading ? (
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center space-y-3">
-            <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <div className="w-10 h-10 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
             <p className="text-xs text-slate-400 font-mono">Connecting live kitchen tickets stream...</p>
           </div>
         </div>

@@ -57,7 +57,7 @@ export default async function PublicCafePage({
   }
 
   const db = createSupabaseAdmin();
-  const [{ data: categories }, { data: items }, { data: tables }] = await Promise.all([
+  const [{ data: categories }, { data: items }, { data: tables }, { data: modifierGroupsData }] = await Promise.all([
     db
       .from("menu_categories")
       .select("id, restaurant_id, name, sort_order")
@@ -70,21 +70,26 @@ export default async function PublicCafePage({
       .eq("available", true),
     db
       .from("restaurant_tables")
-      // qr_token intentionally excluded: never ship tokens in the public HTML
-      // payload. Tokens are resolved lazily via /api/public/resolve-table.
       .select("id, label, seats, active")
       .eq("restaurant_id", tenant.id)
       .eq("active", true)
       .order("label", { ascending: true }),
+    db
+      .from("modifier_groups")
+      .select("id, name, required, min_select, max_select, modifier_options(id, name, price_delta_paise, active)")
+      .eq("restaurant_id", tenant.id)
   ]);
+
+  const itemIds = items?.map(i => i.id) || [];
+  const { data: itemModifiersData } = await db
+    .from("menu_item_modifier_groups")
+    .select("menu_item_id, modifier_group_id")
+    .in("menu_item_id", itemIds);
 
   const orderable = canOrder(tenant);
   const limits = getTierLimits(tenant.tier);
 
-  // Generate structured data for Restaurant
   const restaurantSchema = createRestaurantSchema(tenant);
-
-  // Generate breadcrumb schema
   const breadcrumbSchema = createBreadcrumbSchema([
     { name: "Home", url: "/" },
     { name: "Restaurants", url: "/restaurants" },
@@ -112,6 +117,8 @@ export default async function PublicCafePage({
         tables={tables ?? []}
         categories={categories ?? []}
         items={items ?? []}
+        modifierGroups={modifierGroupsData ?? []}
+        itemModifiers={itemModifiersData ?? []}
         canOrder={orderable}
         limits={limits}
         upiQrUrl={tenant.upi_qr_url || undefined}

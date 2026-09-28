@@ -81,7 +81,7 @@ export function SuperAdminProvider({ children, initialData }: { children: React.
   const [showNewCafeModal, setShowNewCafeModal] = useState(false);
   const [newCafeName, setNewCafeName] = useState("");
   const [newCafeSlug, setNewCafeSlug] = useState("");
-  const [newCafeTier, setNewCafeTier] = useState<"basic" | "pro">("pro");
+  const [newCafeTier, setNewCafeTier] = useState<"starter" | "pro" | "enterprise">("pro");
   const [newCafePlan, setNewCafePlan] = useState<"trial" | "active">("trial");
   const [newCafeTagline, setNewCafeTagline] = useState("");
   const [newCafePhone, setNewCafePhone] = useState("");
@@ -179,7 +179,7 @@ export function SuperAdminProvider({ children, initialData }: { children: React.
     }
   }
 
-  async function handleSetPlan(plan: "trial" | "active" | "suspended", tier?: "basic" | "pro") {
+  async function handleSetPlan(plan: "trial" | "active" | "suspended", tier?: "starter" | "pro" | "enterprise") {
     if (!drawerCafeId) return;
     try {
       const res = await fetch("/api/super/crud", {

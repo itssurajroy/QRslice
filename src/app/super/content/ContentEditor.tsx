@@ -26,7 +26,7 @@ const SECTIONS: { id: SectionId; label: string; key: string; liveUrl: string }[]
 ];
 
 const inputCls =
-  "w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500";
+  "w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand";
 const labelCls = "text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1";
 
 export function ContentEditor({ initial }: { initial: Record<string, any> }) {
@@ -90,7 +90,7 @@ export function ContentEditor({ initial }: { initial: Record<string, any> }) {
             onClick={() => switchSection(s.id)}
             className={`px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap cursor-pointer border transition-colors ${
               section === s.id
-                ? "bg-indigo-600 text-white border-indigo-600"
+                ? "bg-brand text-white border-brand"
                 : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
             }`}
           >
@@ -108,7 +108,7 @@ export function ContentEditor({ initial }: { initial: Record<string, any> }) {
             <h2 className="font-bold text-slate-900 text-sm">{meta.label}</h2>
             <p className="text-xs text-slate-500 font-mono">{meta.key} · {hasOverride ? "customized" : "using built-in defaults"}</p>
           </div>
-          <a href={meta.liveUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-indigo-600 hover:underline">
+          <a href={meta.liveUrl} target="_blank" rel="noreferrer" className="text-xs font-bold text-brand hover:underline">
             View live ↗
           </a>
         </div>
@@ -133,7 +133,7 @@ export function ContentEditor({ initial }: { initial: Record<string, any> }) {
             type="button"
             onClick={save}
             disabled={busy}
-            className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs cursor-pointer"
+            className="px-4 py-2.5 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs cursor-pointer"
           >
             {busy ? "Saving…" : "Save & Publish"}
           </button>

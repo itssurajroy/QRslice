@@ -19,7 +19,7 @@ const SPINNER_SIZES: Record<NonNullable<SpinnerProps["size"]>, string> = {
 };
 
 const SPINNER_COLORS: Record<NonNullable<SpinnerProps["color"]>, string> = {
-  indigo: "border-indigo-500 border-t-transparent",
+  indigo: "border-brand border-t-transparent",
   white: "border-white border-t-transparent",
   slate: "border-slate-500 border-t-transparent",
 };

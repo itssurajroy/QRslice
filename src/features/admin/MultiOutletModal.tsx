@@ -176,7 +176,7 @@ export function MultiOutletModal({
         {/* Modal Header */}
         <div>
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-brand-lavender text-brand-dark border border-brand-lavender">
               ⚡ Franchise Enterprise Dashboard
             </span>
             <span
@@ -249,7 +249,7 @@ export function MultiOutletModal({
           <button
             type="button"
             onClick={() => setShowAddModal(true)}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-md cursor-pointer transition-transform active:scale-95 flex items-center justify-center gap-1.5"
+            className="px-4 py-2 bg-brand hover:bg-brand-dark text-white rounded-xl text-xs font-black shadow-md cursor-pointer transition-transform active:scale-95 flex items-center justify-center gap-1.5"
           >
             <span>+</span> Add Franchise Branch
           </button>
@@ -259,7 +259,7 @@ export function MultiOutletModal({
         <div className="flex-1 overflow-y-auto space-y-3 pr-1 min-h-[220px] max-h-[360px]">
           {loading ? (
             <div className="text-center py-12 space-y-2">
-              <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <div className="w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin mx-auto"></div>
               <p className="text-xs text-slate-500 font-bold">Syncing live outlet metrics across franchise...</p>
             </div>
           ) : filteredOutlets.length === 0 ? (
@@ -275,7 +275,7 @@ export function MultiOutletModal({
                   key={out.id}
                   className={`p-4 rounded-2xl border transition-all duration-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
                     isCurrent
-                      ? "bg-indigo-50/80 border-indigo-300 ring-2 ring-indigo-500/20 shadow-sm"
+                      ? "bg-brand-lavender/80 border-indigo-300 ring-2 ring-indigo-500/20 shadow-sm"
                       : "bg-white border-slate-200 hover:border-indigo-300 hover:shadow-md"
                   }`}
                 >
@@ -283,7 +283,7 @@ export function MultiOutletModal({
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-black text-slate-900 text-base">{out.name}</span>
                       {isCurrent ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white font-black text-[9px] uppercase tracking-wider">
+                        <span className="px-2.5 py-0.5 rounded-full bg-brand text-white font-black text-[9px] uppercase tracking-wider">
                           ✓ Current Context
                         </span>
                       ) : (
@@ -339,12 +339,12 @@ export function MultiOutletModal({
                         <button
                           type="button"
                           onClick={() => handleSwitchOutlet(out)}
-                          className="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-xs shadow-sm transition-all active:scale-95 cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-xl bg-brand hover:bg-brand-dark text-white font-extrabold text-xs shadow-sm transition-all active:scale-95 cursor-pointer"
                         >
                           Switch Outlet &rarr;
                         </button>
                       ) : (
-                        <span className="text-xs font-black text-indigo-600 px-2 py-1">Active Outlet</span>
+                        <span className="text-xs font-black text-brand px-2 py-1">Active Outlet</span>
                       )}
                     </div>
                   </div>
@@ -359,7 +359,7 @@ export function MultiOutletModal({
           <Link
             href="/super"
             onClick={onClose}
-            className="text-indigo-600 font-extrabold hover:underline flex items-center gap-1"
+            className="text-brand font-extrabold hover:underline flex items-center gap-1"
           >
             <span>👑</span> Open Super Admin Console (/super) &rarr;
           </Link>
@@ -468,7 +468,7 @@ export function MultiOutletModal({
                 <button
                   type="submit"
                   disabled={creatingBranch}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl shadow-md cursor-pointer transition-transform active:scale-95 disabled:opacity-50"
+                  className="px-4 py-2 bg-brand hover:bg-brand-dark text-white text-xs font-black rounded-xl shadow-md cursor-pointer transition-transform active:scale-95 disabled:opacity-50"
                 >
                   {creatingBranch ? "Creating Branch..." : "Create Franchise Branch"}
                 </button>

@@ -7,11 +7,9 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 import { RegisterView } from "@/features/pos/RegisterView";
 import { KitchenView } from "@/features/pos/KitchenView";
 import { VisualFloorGrid } from "@/features/pos/VisualFloorGrid";
-import { WhatsAppBillButton } from "@/features/pos/WhatsAppBillButton";
 import { generateBeautifulBillPdf } from "@/lib/bill-pdf";
 import { api } from "@/lib/api";
 import { getWaLink, isValidIndianPhone, normalizeWaPhone } from "@/lib/utils";
-import { renderWhatsAppMessage, buildWhatsAppReceiptVars } from "@/lib/whatsapp-templates";
 import { speakHumanVoice } from "@/lib/tts";
 import { useToast } from "@/components/ToastProvider";
 import { usePrinter } from "@/components/printer/PrinterProvider";
@@ -55,7 +53,7 @@ interface BillData {
   finalTotalPaise?: number;
   subtotalPaise?: number;
   discountPaise?: number;
-  payment_status: "paid" | "unpaid";
+  payment_status: "paid" | "unpaid" | "verification_pending";
   payment_method?: string;
   paymentMethod?: string;
   table_label?: string;
@@ -294,58 +292,8 @@ export default function PosClient({
         flash("err", "Please enter a valid 10-digit mobile number");
         return;
       }
-
-      setIsSendingWa(true);
-      flash("ok", `Opening WhatsApp bill for +${normalizeWaPhone(cleanPhone)}...`);
-
-      try {
-        if (orderDetails.orderId && !orderDetails.orderId.startsWith("POS-")) {
-          api.updateOrderCustomer(orderDetails.orderId, cleanPhone).catch(() => {});
-        }
-
-        const host = typeof window !== "undefined" ? window.location.origin : "https://qrslice.com";
-        const receiptUrl = `${host}/receipt/${orderDetails.statusToken}`;
-
-        const vars = buildWhatsAppReceiptVars({
-          restaurantName: restaurant.name || "our café",
-          restaurantGstin: restaurant.gstin,
-          orderNumber: orderDetails.orderNumber,
-          tableLabel: orderDetails.tableLabel,
-          totalPaise: orderDetails.totalPaise,
-          paymentMethod: orderDetails.paymentMethod,
-          receiptUrl,
-        });
-
-        const message = renderWhatsAppMessage(waSettings?.message_template, vars);
-        const waLink = getWaLink(cleanPhone, message);
-
-        // Telemetry logging
-        fetch("/api/whatsapp/log-event", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            order_id: orderDetails.orderId && !orderDetails.orderId.startsWith("POS-") ? orderDetails.orderId : null,
-            restaurant_id: restaurant.id,
-            event_type: "sent",
-            phone: cleanPhone,
-            meta: { order_number: orderDetails.orderNumber, source: "pos" },
-          }),
-        }).catch(() => {});
-
-        const win = window.open(waLink, "_blank");
-        if (!win || win.closed || typeof win.closed === "undefined") {
-          setBlockedWaUrl(waLink);
-          flash("err", "Pop-up blocked by browser. Please use the Copy Link button below.");
-        } else {
-          setWaModal(null);
-        }
-      } catch {
-        flash("err", "Failed to prepare WhatsApp message");
-      } finally {
-        setTimeout(() => setIsSendingWa(false), 600);
-      }
     },
-    [restaurant.name, restaurant.gstin, restaurant.id, waSettings, flash]
+    [restaurant.id, flash]
   );
 
   const openWhatsAppModal = useCallback(
@@ -1051,7 +999,7 @@ export default function PosClient({
   }, [liveOrders, openingFloat, payoutsAmount, actualCashCount]);
 
   return (
-    <main className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <main className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans selection:bg-brand-lavender0 selection:text-white">
       {/* POS HEADER / TOP MISSION-CRITICAL WORKSTATION BAR */}
       <header className="h-14 bg-[#F5F5F7]/90 backdrop-blur-xl border-b border-black/[0.06] px-3 sm:px-4 flex items-center justify-between shadow-xs shrink-0 z-30 sticky top-0">
         <div className="flex items-center gap-3">
@@ -1253,6 +1201,65 @@ export default function PosClient({
           </div>
         </div>
       </header>
+
+      {/* VERIFICATION PENDING BANNER (UPI) */}
+      {liveOrders.filter(o => o.payment_status === "verification_pending").map(order => (
+        <div key={`verify-${order.id}`} className="bg-amber-100 border-b-2 border-amber-300 px-4 py-3 flex items-center justify-between shadow-sm animate-in slide-in-from-top z-20 relative">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-amber-500 rounded-xl text-white flex items-center justify-center font-black animate-pulse shadow-sm">
+              ₹
+            </div>
+            <div>
+              <h3 className="text-amber-950 font-black text-sm uppercase tracking-wider">
+                Verify UPI Payment
+              </h3>
+              <p className="text-amber-800 text-xs font-semibold">
+                Table {order.table_label || "Counter"} • Order #{order.order_number} • ₹{(order.total_paise / 100).toFixed(2)}
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  const res = await fetch("/api/pos/active-orders", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ orderId: order.id, payment_status: "unpaid" }),
+                  });
+                  if (!res.ok) throw new Error("Failed to reject");
+                  toast.error("Payment rejected");
+                  fetchLiveOrders();
+                } catch (err) {}
+              }}
+              className="px-4 py-2 bg-white text-rose-600 font-bold text-xs rounded-xl border border-rose-200 hover:bg-rose-50 shadow-sm active:scale-95 transition-all cursor-pointer"
+            >
+              Reject (Not Received)
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  const res = await fetch("/api/pos/active-orders", {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ orderId: order.id, payment_status: "paid", payment_method: "upi" }),
+                  });
+                  if (!res.ok) throw new Error("Failed to verify");
+                  toast.success("Payment verified!");
+                  flash("ok", "UPI Payment Verified ✓");
+                  speakVoice("UPI Payment Received");
+                  fetchLiveOrders();
+                } catch (err) {}
+              }}
+              className="px-4 py-2 bg-[#29A05C] text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 hover:bg-[#22874d] active:scale-95 transition-all cursor-pointer"
+            >
+              Approve (Money Received)
+            </button>
+          </div>
+        </div>
+      ))}
 
       {/* POS MAIN WORKSPACE AREA */}
       {viewMode === "catalog" && (
@@ -1639,25 +1646,7 @@ export default function PosClient({
                   <span>💬 WhatsApp</span>
                 </button>
 
-                {/* Queued server-side bill via POST /api/whatsapp/send (async outbox). */}
-                {lastBill.id && (
-                  <WhatsAppBillButton
-                    orderId={lastBill.id}
-                    phone={lastBill.customer_phone || customerPhone || ""}
-                    notify={flash}
-                    onPhoneRequired={() =>
-                      openWhatsAppModal({
-                        orderId: lastBill.id || "",
-                        orderNumber: lastBill.order_number || lastBill.orderNumber || "",
-                        customerPhone: "",
-                        totalPaise: lastBill.finalTotalPaise ?? lastBill.total_paise ?? 0,
-                        statusToken: lastBill.status_token || lastBill.id || "",
-                        tableLabel: lastBill.table_label,
-                        paymentMethod: lastBill.paymentMethod || lastBill.payment_method,
-                      })
-                    }
-                  />
-                )}
+                {/* WhatsApp button removed */}
 
                 <button
                   type="button"

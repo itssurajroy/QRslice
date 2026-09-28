@@ -103,7 +103,7 @@ export function BookingWidget({ slug }: { slug: string }) {
     }
   }
 
-  const input = "w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all";
+  const input = "w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand focus:ring-1 focus:ring-indigo-500 transition-all";
   const labelStyle = "text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1.5";
 
   return (
@@ -135,7 +135,7 @@ export function BookingWidget({ slug }: { slug: string }) {
             </div>
             
             <button type="submit" disabled={checkingAvailability || !time}
-              className="w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-black text-sm shadow-md shadow-indigo-600/20 transition-all cursor-pointer">
+              className="w-full py-3.5 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-black text-sm shadow-md shadow-brand/20 transition-all cursor-pointer">
               {checkingAvailability ? "Checking..." : "Find a Table →"}
             </button>
           </form>
@@ -168,7 +168,7 @@ export function BookingWidget({ slug }: { slug: string }) {
                     type="button"
                     className={`flex flex-col items-center justify-center p-3 rounded-2xl border transition-all cursor-pointer ${
                       isSelected
-                        ? "bg-indigo-600 border-indigo-600 shadow-md shadow-indigo-600/20 scale-105"
+                        ? "bg-brand border-brand shadow-md shadow-brand/20 scale-105"
                         : isTooSmall 
                           ? "bg-white border-amber-200 hover:border-amber-400"
                           : "bg-white border-slate-200 hover:border-indigo-400"
@@ -193,7 +193,7 @@ export function BookingWidget({ slug }: { slug: string }) {
                 type="button" 
                 onClick={() => setStep(3)} 
                 disabled={!selectedTable}
-                className="flex-1 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-black text-sm shadow-md shadow-indigo-600/20 transition-all cursor-pointer"
+                className="flex-1 py-3 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-black text-sm shadow-md shadow-brand/20 transition-all cursor-pointer"
               >
                 Confirm Table →
               </button>

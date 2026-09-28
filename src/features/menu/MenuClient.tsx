@@ -9,7 +9,7 @@ import { useAudioTone } from "@/hooks/useAudioTone";
 import { useOfflineStatus } from "@/hooks/useOfflineStatus";
 import { paise, getItemImage, getPrepTime } from "@/lib/utils";
 import { api } from "@/lib/api";
-import type { Category, MenuItem as Item } from "@/types";
+import type { Category, MenuItem as Item, ModifierOption } from "@/types";
 
 // Extracted UI Features
 import { MenuHeader } from "./MenuHeader";
@@ -55,6 +55,7 @@ export function MenuClient({
   items,
   accentColor,
   upiQrUrl,
+  upiId,
 }: {
   qrToken: string;
   tableLabel: string;
@@ -63,6 +64,7 @@ export function MenuClient({
   items: Item[];
   accentColor?: string;
   upiQrUrl?: string;
+  upiId?: string;
 }) {
   const router = useRouter();
   const t = I18N.en;
@@ -125,9 +127,6 @@ export function MenuClient({
   const [cartOpen, setCartOpen] = useState(false);
   const [lightboxItem, setLightboxItem] = useState<Item | null>(null);
   const [customizeItem, setCustomizeItem] = useState<Item | null>(null);
-  const [customSpice, setCustomSpice] = useState("Medium");
-  const [customSize, setCustomSize] = useState("Regular");
-  const [customNote, setCustomNote] = useState("");
   const [upsellItem, setUpsellItem] = useState<Item | null>(null);
   const upsellTimeout = useRef<NodeJS.Timeout | null>(null);
   const [cartPulse, setCartPulse] = useState(false);
@@ -181,9 +180,9 @@ export function MenuClient({
   const loyaltyPoints = Math.floor(totalPaise / 10000); // 1 pt per ₹100
 
   // Actions
-  function handleAdd(item: Item, spiceLevel?: string, sizeVariant?: string, note?: string) {
+  function handleAdd(item: Item, selectedModifiers: ModifierOption[] = [], note?: string) {
     playAudioTone("add");
-    addItem(item, { spiceLevel, sizeVariant, notes: note });
+    addItem(item, { selectedModifiers, notes: note || "" });
     setCartPulse(true);
     setTimeout(() => setCartPulse(false), 600);
 
@@ -205,14 +204,11 @@ export function MenuClient({
 
   function openCustomizeModal(item: Item) {
     setCustomizeItem(item);
-    setCustomSpice("Medium");
-    setCustomSize("Regular");
-    setCustomNote("");
   }
 
-  function confirmCustomization() {
+  function confirmCustomization(selectedModifiers: ModifierOption[], customNote: string) {
     if (!customizeItem) return;
-    handleAdd(customizeItem, customSpice, customSize, customNote);
+    handleAdd(customizeItem, selectedModifiers, customNote);
     setCustomizeItem(null);
   }
 
@@ -251,8 +247,7 @@ export function MenuClient({
           itemId: l.item.id,
           quantity: l.quantity,
           notes: l.notes || undefined,
-          spiceLevel: l.spiceLevel || undefined,
-          sizeVariant: l.sizeVariant || undefined,
+          modifiers: l.selectedModifiers?.map(m => ({ option_name: m.name, price_delta_paise: m.price_delta_paise })) || [],
         })),
         customerName: name.trim() || undefined,
         customerPhone: phone.trim() || undefined,
@@ -565,13 +560,8 @@ export function MenuClient({
 
       <MenuCustomizationSheet
         item={customizeItem}
+        allItems={items}
         onClose={() => setCustomizeItem(null)}
-        customSpice={customSpice}
-        setCustomSpice={setCustomSpice}
-        customSize={customSize}
-        setCustomSize={setCustomSize}
-        customNote={customNote}
-        setCustomNote={setCustomNote}
         onConfirm={confirmCustomization}
       />
 
@@ -609,6 +599,7 @@ export function MenuClient({
         onUpdateNote={updateNotes}
         t={t}
         upiQrUrl={upiQrUrl}
+        upiId={upiId}
       />
     </main>
   );

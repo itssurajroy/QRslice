@@ -69,7 +69,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </button>
               <button
                 onClick={this.handleReset}
-                className="flex-1 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs cursor-pointer shadow-lg shadow-indigo-600/25"
+                className="flex-1 py-3 rounded-xl bg-brand hover:bg-brand-dark text-white font-black text-xs cursor-pointer shadow-lg shadow-brand/25"
               >
                 Try Again →
               </button>

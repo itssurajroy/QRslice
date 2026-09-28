@@ -9,8 +9,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { status_token, rating, feedback, compliments = [] } = body;
-  if (!status_token || !rating) {
+  const { status_token, rating, feedback, compliments = [], is_google_click = false } = body;
+  if (!status_token) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
@@ -26,7 +26,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
-  // Record feedback into audit_events for admin insights
+  if (is_google_click) {
+    // Log Google Review Click independently
+    const { error: clickErr } = await admin.from("audit_events").insert({
+      restaurant_id: order.restaurant_id,
+      entity: "customer_feedback",
+      entity_id: order.id,
+      action: "google_review_clicked",
+      metadata: {
+        order_id: order.id,
+        order_number: order.order_number,
+        rating: rating || 5, // Implicit 5 if they clicked directly
+        clicked_at: new Date().toISOString(),
+      },
+    });
+    if (clickErr) return NextResponse.json({ error: clickErr.message }, { status: 500 });
+    return NextResponse.json({ ok: true, message: "Click logged" });
+  }
+
+  // Record standard feedback into audit_events for admin insights
   const { error: aErr } = await admin.from("audit_events").insert({
     restaurant_id: order.restaurant_id,
     entity: "customer_feedback",

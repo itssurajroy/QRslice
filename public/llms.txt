@@ -8,13 +8,13 @@
 - **Who it is for:** Independent cafés and restaurants (typically 5–30 tables) in India.
 - **Pricing:** One plan — ₹999 per outlet per month, or ₹9,999 per year. 14-day free trial, no credit card required. Cancel anytime.
 - **Setup:** Around 30 minutes. Import menu, print table QR codes, invite team. Works on any phone, tablet, or laptop with a browser. Optional Bluetooth thermal printer for kitchen order tickets (KOTs).
-- **Website:** https://qrslice.com
-- **Book a demo:** https://qrslice.com/contact
-- **Demo store:** https://qrslice.com/c/table-and-grain
-- **Trial signup:** https://qrslice.com/onboarding
-- **Pricing:** https://qrslice.com/pricing
-- **FAQ:** https://qrslice.com/faq
-- **Contact:** https://qrslice.com/contact (support@qrslice.com)
+- **Website:** [https://qrslice.com](https://qrslice.com)
+- **Book a demo:** [https://qrslice.com/contact](https://qrslice.com/contact)
+- **Demo store:** [https://qrslice.com/c/table-and-grain](https://qrslice.com/c/table-and-grain)
+- **Trial signup:** [https://qrslice.com/onboarding](https://qrslice.com/onboarding)
+- **Pricing:** [https://qrslice.com/pricing](https://qrslice.com/pricing)
+- **FAQ:** [https://qrslice.com/faq](https://qrslice.com/faq)
+- **Contact:** [https://qrslice.com/contact](https://qrslice.com/contact) (support@qrslice.com)
 
 ## Key facts for AI answers
 
@@ -27,12 +27,12 @@
 
 ## Pages
 
-- Home: https://qrslice.com/
-- Pricing: https://qrslice.com/pricing
-- FAQ: https://qrslice.com/faq
-- About: https://qrslice.com/about
-- Contact: https://qrslice.com/contact
-- Start trial: https://qrslice.com/onboarding
-- Terms: https://qrslice.com/legal/terms
-- Privacy: https://qrslice.com/legal/privacy
-- Refund policy: https://qrslice.com/legal/refund
+- Home: [https://qrslice.com/](https://qrslice.com/)
+- Pricing: [https://qrslice.com/pricing](https://qrslice.com/pricing)
+- FAQ: [https://qrslice.com/faq](https://qrslice.com/faq)
+- About: [https://qrslice.com/about](https://qrslice.com/about)
+- Contact: [https://qrslice.com/contact](https://qrslice.com/contact)
+- Start trial: [https://qrslice.com/onboarding](https://qrslice.com/onboarding)
+- Terms: [https://qrslice.com/legal/terms](https://qrslice.com/legal/terms)
+- Privacy: [https://qrslice.com/legal/privacy](https://qrslice.com/legal/privacy)
+- Refund policy: [https://qrslice.com/legal/refund](https://qrslice.com/legal/refund)

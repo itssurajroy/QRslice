@@ -93,10 +93,40 @@ export default async function NamedCafeTablePage({
       .order('sort_order'),
     db
       .from('menu_items')
-      .select('id, restaurant_id, category_id, name, description, price_paise, image_url, is_veg, available')
+      .select(`
+        id, restaurant_id, category_id, name, description, price_paise, image_url, is_veg, available, sort_order,
+        is_bestseller, spice_index, tags, cross_sell_items,
+        menu_item_modifier_groups(
+          modifier_groups(
+            id, restaurant_id, name, min_select, max_select, required,
+            modifier_options(id, modifier_group_id, name, price_delta_paise, active)
+          )
+        )
+      `)
       .eq('restaurant_id', tenant.id)
       .eq('available', true),
   ]);
+
+  const mappedItems = (items ?? []).map((item: any) => {
+    const modifier_groups = item.menu_item_modifier_groups
+      ?.map((link: any) => link.modifier_groups)
+      .filter(Boolean) || [];
+
+    // Filter to only active modifier options
+    modifier_groups.forEach((group: any) => {
+      if (group.modifier_options) {
+        group.options = group.modifier_options.filter((opt: any) => opt.active);
+        delete group.modifier_options;
+      }
+    });
+
+    delete item.menu_item_modifier_groups;
+    
+    return {
+      ...item,
+      modifier_groups
+    };
+  });
 
   return (
     <MenuClient
@@ -104,7 +134,7 @@ export default async function NamedCafeTablePage({
       tableLabel={table.label}
       restaurantName={tenant.name}
       categories={categories ?? []}
-      items={items ?? []}
+      items={mappedItems}
     />
   );
 }

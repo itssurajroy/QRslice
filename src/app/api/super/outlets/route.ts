@@ -23,23 +23,40 @@ export async function GET(req: NextRequest) {
   const { data: cafes, count, error } = await query.range((page - 1) * limit, page * limit - 1);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const outlets = (cafes ?? []).map((c: any, idx: number) => ({
-    id: `out-${c.id}`,
-    name: c.name,
-    restaurant: c.name,
-    restaurantSlug: c.slug,
-    location: c.address || "N/A",
-    plan: (c.plan || "trial").toUpperCase(),
-    tables: 12 + (idx % 18),
-    ordersToday: Math.floor(Math.random() * 30) + 5,
-    gmv30d: Math.floor(Math.random() * 400000) + 50000,
-    lastActive: "Just now",
-    health: (c.billing_status === "active" || c.plan === "active") ? "Healthy" as const : "Attention" as const,
-    status: c.plan === "suspended" ? "Suspended" as const : "Active" as const,
-    posDevices: 1 + (idx % 3),
-    kdsDevices: 1 + (idx % 2),
-    printers: 1 + (idx % 3),
-  }));
+  const restaurantIds = (cafes ?? []).map((c: any) => c.id);
+  let kpisMap: Record<string, any> = {};
+
+  if (restaurantIds.length > 0) {
+    const { data: kpis } = await db.rpc("get_super_admin_outlet_kpis", {
+      restaurant_ids: restaurantIds
+    });
+    if (kpis && Array.isArray(kpis)) {
+      for (const kpi of kpis) {
+        kpisMap[kpi.restaurant_id] = kpi;
+      }
+    }
+  }
+
+  const outlets = (cafes ?? []).map((c: any, idx: number) => {
+    const kpi = kpisMap[c.id] || {};
+    return {
+      id: `out-${c.id}`,
+      name: c.name,
+      restaurant: c.name,
+      restaurantSlug: c.slug,
+      location: c.address || "N/A",
+      plan: (c.plan || "trial").toUpperCase(),
+      tables: 12 + (idx % 18),
+      ordersToday: kpi.orders_today || 0,
+      gmv30d: kpi.gmv_30d || 0,
+      lastActive: "Just now",
+      health: (c.billing_status === "active" || c.plan === "active") ? "Healthy" as const : "Attention" as const,
+      status: c.plan === "suspended" ? "Suspended" as const : "Active" as const,
+      posDevices: kpi.pos_devices || 1,
+      kdsDevices: kpi.kds_devices || 1,
+      printers: kpi.printers || 1,
+    };
+  });
 
   return NextResponse.json({
     ok: true,

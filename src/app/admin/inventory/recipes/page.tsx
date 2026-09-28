@@ -9,7 +9,7 @@ function AdminHeader({ title }: { title: string }) {
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-xl font-bold text-indigo-600">
+          <Link href="/" className="text-xl font-bold text-brand">
             QRslice
           </Link>
           <span className="text-slate-300">/</span>
@@ -171,7 +171,7 @@ export default function RecipesPage() {
                 required
                 value={selectedMenuItem}
                 onChange={(e) => setSelectedMenuItem(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500"
               >
                 <option value="">Select menu item</option>
                 {menuItems.map((item) => (
@@ -189,7 +189,7 @@ export default function RecipesPage() {
                 required
                 value={selectedIngredient}
                 onChange={(e) => setSelectedIngredient(e.target.value)}
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500"
               >
                 <option value="">Select ingredient</option>
                 {ingredients.map((item) => (
@@ -209,14 +209,14 @@ export default function RecipesPage() {
                 required
                 value={quantity || ""}
                 onChange={(e) => setQuantity(parseFloat(e.target.value) || 0)}
-                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 placeholder="e.g., 0.5"
               />
             </div>
           </div>
           <button
             type="submit"
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+            className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
           >
             Add to Recipe
           </button>

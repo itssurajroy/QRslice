@@ -11,7 +11,7 @@ export type Tenant = {
   tagline: string | null;
   google_review_url: string | null;
   plan: "trial" | "active" | "suspended" | "cancelled";
-  tier?: "all_in_one" | "pro" | "basic";
+  tier?: "starter" | "pro" | "enterprise";
   trial_starts_at: string | null;
   trial_ends_at: string | null;
   subscription_ends_at: string | null;
@@ -27,10 +27,36 @@ export type TierLimits = {
   branding: boolean;
   analytics: boolean;
   multiLocation: boolean;
+  crm: boolean;
+  loyalty: boolean;
 };
 
 // Single unified QRslice plan (Unlimited Everything, ₹999/mo, ₹9,999/yr)
-export function getTierLimits(_tier?: string): TierLimits {
+export function getTierLimits(tier: string = "pro"): TierLimits {
+  if (tier === "starter") {
+    return {
+      maxTables: null,
+      maxItems: null,
+      kds: true,
+      branding: true,
+      analytics: true,
+      multiLocation: true,
+      crm: true,
+      loyalty: true,
+    };
+  }
+  if (tier === "pro") {
+    return {
+      maxTables: null,
+      maxItems: null,
+      kds: true,
+      branding: true,
+      analytics: true,
+      multiLocation: true,
+      crm: true,
+      loyalty: true,
+    };
+  }
   return {
     maxTables: null,
     maxItems: null,
@@ -38,6 +64,8 @@ export function getTierLimits(_tier?: string): TierLimits {
     branding: true,
     analytics: true,
     multiLocation: true,
+    crm: true,
+    loyalty: true,
   };
 }
 

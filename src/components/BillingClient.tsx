@@ -381,29 +381,34 @@ export default function BillingClient({ restaurant }: BillingClientProps) {
 
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               {!isPaidActive ? (
-                <button
-                  type="button"
-                  onClick={() => handleSubscribe(false)}
-                  disabled={loading || simulating || plansLoading}
-                  className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-[#007AFF] hover:bg-[#0062CC] text-white font-bold text-xs transition-all shadow-md shadow-[#007AFF]/20 active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Opening Razorpay…</span>
-                    </>
-                  ) : plansLoading ? (
-                    <>
-                      <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Loading plans…</span>
-                    </>
-                  ) : (
-                    <>
-                      <CreditCardIcon className="w-4 h-4" />
-                      <span>Subscribe Now (₹{currentPrice.toLocaleString("en-IN")}) →</span>
-                    </>
-                  )}
-                </button>
+                <div className="flex flex-col items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => handleSubscribe(false)}
+                    disabled={loading || simulating || plansLoading}
+                    className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-[#007AFF] hover:bg-[#0062CC] text-white font-bold text-xs transition-all shadow-md shadow-[#007AFF]/20 active:scale-95 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    {loading ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Opening Razorpay…</span>
+                      </>
+                    ) : plansLoading ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Loading plans…</span>
+                      </>
+                    ) : (
+                      <>
+                        <CreditCardIcon className="w-4 h-4" />
+                        <span>Subscribe Now (₹{currentPrice.toLocaleString("en-IN")}) →</span>
+                      </>
+                    )}
+                  </button>
+                  <p className="text-[10px] text-slate-500 text-center max-w-[280px] leading-snug">
+                    By subscribing, you authorize a recurring <strong>{billingCycle === 'monthly' ? 'monthly' : 'annual'}</strong> charge of <strong>₹{currentPrice.toLocaleString("en-IN")}</strong>. Your subscription will auto-renew automatically until you cancel. You can cancel at any time in your account settings.
+                  </p>
+                </div>
               ) : (
                 <button
                   type="button"

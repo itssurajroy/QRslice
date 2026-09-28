@@ -10,7 +10,7 @@ function AdminHeader({ title }: { title: string }) {
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 shadow-sm backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-xl font-bold text-indigo-600">
+          <Link href="/" className="text-xl font-bold text-brand">
             QRslice
           </Link>
           <span className="text-slate-300">/</span>
@@ -207,7 +207,7 @@ export default function InventoryPage() {
             </div>
             <button
               onClick={() => setShowAddForm(true)}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+              className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark"
             >
               Add Ingredient
             </button>
@@ -248,12 +248,12 @@ export default function InventoryPage() {
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Name</label>
                     <input type="text" required value={newIngredient.name} onChange={(e) => setNewIngredient({ ...newIngredient, name: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="e.g., Milk" />
+                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="e.g., Milk" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Unit</label>
                     <select value={newIngredient.unit} onChange={(e) => setNewIngredient({ ...newIngredient, unit: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500">
                       <option value="kg">Kilogram (kg)</option>
                       <option value="g">Gram (g)</option>
                       <option value="litre">Litre</option>
@@ -266,21 +266,21 @@ export default function InventoryPage() {
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Cost per Unit ({"\u20B9"})</label>
                     <input type="number" step="0.01" value={newIngredient.cost_per_unit} onChange={(e) => setNewIngredient({ ...newIngredient, cost_per_unit: parseFloat(e.target.value) || 0 })}
-                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Minimum Stock (reorder at)</label>
                     <input type="number" step="0.01" value={newIngredient.min_stock} onChange={(e) => setNewIngredient({ ...newIngredient, min_stock: parseFloat(e.target.value) || 0 })}
-                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Category</label>
                     <input type="text" value={newIngredient.category} onChange={(e) => setNewIngredient({ ...newIngredient, category: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="e.g., Dairy, Spices" />
+                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="e.g., Dairy, Spices" />
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <button type="submit" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Add Ingredient</button>
+                  <button type="submit" className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">Add Ingredient</button>
                   <button type="button" onClick={() => setShowAddForm(false)} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
                 </div>
               </form>
@@ -297,7 +297,7 @@ export default function InventoryPage() {
                     <div>
                       <label className="block text-sm font-medium text-slate-700">From</label>
                       <select value={transferData.from_location} onChange={(e) => setTransferData({ ...transferData, from_location: e.target.value })}
-                        className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500">
                         <option value="kitchen">Kitchen</option>
                         <option value="storage">Storage</option>
                       </select>
@@ -305,7 +305,7 @@ export default function InventoryPage() {
                     <div>
                       <label className="block text-sm font-medium text-slate-700">To</label>
                       <select value={transferData.to_location} onChange={(e) => setTransferData({ ...transferData, to_location: e.target.value })}
-                        className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500">
                         <option value="storage">Storage</option>
                         <option value="kitchen">Kitchen</option>
                       </select>
@@ -314,10 +314,10 @@ export default function InventoryPage() {
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Quantity ({selectedIngredient.unit})</label>
                     <input type="number" step="0.01" required value={transferData.quantity} onChange={(e) => setTransferData({ ...transferData, quantity: parseFloat(e.target.value) || 0 })}
-                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500" />
                   </div>
                   <div className="flex gap-3">
-                    <button type="submit" className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Transfer</button>
+                    <button type="submit" className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">Transfer</button>
                     <button type="button" onClick={() => { setShowTransferForm(false); setSelectedIngredient(null); }} className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancel</button>
                   </div>
                 </form>
@@ -334,7 +334,7 @@ export default function InventoryPage() {
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Add to Location</label>
                     <select value={purchaseData.location} onChange={(e) => setPurchaseData({ ...purchaseData, location: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500">
                       <option value="kitchen">Kitchen</option>
                       <option value="storage">Storage</option>
                     </select>
@@ -342,17 +342,17 @@ export default function InventoryPage() {
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Quantity ({selectedIngredient.unit})</label>
                     <input type="number" step="0.01" required value={purchaseData.quantity} onChange={(e) => setPurchaseData({ ...purchaseData, quantity: parseFloat(e.target.value) || 0 })}
-                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Supplier (optional)</label>
                     <input type="text" value={purchaseData.supplier} onChange={(e) => setPurchaseData({ ...purchaseData, supplier: e.target.value })}
-                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="e.g., Amul Distributor" />
+                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500" placeholder="e.g., Amul Distributor" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-700">Cost ({"\u20B9"})</label>
                     <input type="number" step="0.01" value={purchaseData.cost} onChange={(e) => setPurchaseData({ ...purchaseData, cost: parseFloat(e.target.value) || 0 })}
-                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                      className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-indigo-500" />
                   </div>
                   <div className="flex gap-3">
                     <button type="submit" className="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">Record Purchase</button>
@@ -406,7 +406,7 @@ export default function InventoryPage() {
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => { setSelectedIngredient(item); setShowTransferForm(true); }} className="text-indigo-600 hover:text-indigo-900">Transfer</button>
+                          <button onClick={() => { setSelectedIngredient(item); setShowTransferForm(true); }} className="text-brand hover:text-indigo-900">Transfer</button>
                           <button onClick={() => { setSelectedIngredient(item); setShowPurchaseForm(true); }} className="text-green-600 hover:text-green-900">Purchase</button>
                           <button onClick={() => deleteIngredient(item.id)} className="text-red-600 hover:text-red-900">Delete</button>
                         </div>
@@ -420,8 +420,8 @@ export default function InventoryPage() {
 
           {/* Sub-nav */}
           <div className="flex gap-4 text-sm">
-            <Link href="/admin/inventory/recipes" className="text-indigo-600 hover:text-indigo-800 font-medium">Recipe Management →</Link>
-            <Link href="/admin/inventory/gravies" className="text-indigo-600 hover:text-indigo-800 font-medium">Gravy Recipes →</Link>
+            <Link href="/admin/inventory/recipes" className="text-brand hover:text-indigo-800 font-medium">Recipe Management →</Link>
+            <Link href="/admin/inventory/gravies" className="text-brand hover:text-indigo-800 font-medium">Gravy Recipes →</Link>
           </div>
         </div>
       </main>

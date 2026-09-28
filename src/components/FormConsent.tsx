@@ -34,7 +34,7 @@ export function FormConsent({
           required={required}
           aria-invalid={error}
           aria-describedby={error ? "consent-error" : undefined}
-          className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-indigo-600"
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-brand"
         />
         <span className="text-sm text-slate-600">{label}</span>
       </label>

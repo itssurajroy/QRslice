@@ -57,7 +57,8 @@ export function ModifiersTab({ flash }: { flash: (kind: "ok" | "err", msg: strin
         body: JSON.stringify({ groups: updated }),
       });
       if (res.ok) {
-        setGroups(updated);
+        const data = await res.json();
+        setGroups(data.groups || updated);
       } else {
         flash("err", "Failed to save modifiers");
       }
@@ -186,7 +187,7 @@ export function ModifiersTab({ flash }: { flash: (kind: "ok" | "err", msg: strin
                       >
                         {group.required ? "REQUIRED" : "OPTIONAL"}
                       </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-brand-lavender text-brand-dark">
                         {group.multi_select ? "MULTI SELECT" : "SINGLE CHOICE"}
                       </span>
                     </div>

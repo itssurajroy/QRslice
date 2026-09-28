@@ -76,7 +76,7 @@ export function TicketCard({ ticket }: { ticket: Ticket }) {
 
   return (
     <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl space-y-4 text-center">
-      <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest">Table Reservation</p>
+      <p className="text-xs font-bold text-brand uppercase tracking-widest">Table Reservation</p>
       <h1 className="text-2xl font-bold text-slate-900">{cafe?.name}</h1>
       <p className="text-sm text-slate-600">Tables {ticket.table_labels.join(", ")} • {ticket.party_size} guests</p>
       <p className="text-sm text-slate-600">
@@ -93,7 +93,7 @@ export function TicketCard({ ticket }: { ticket: Ticket }) {
         </a>
       )}
       <button type="button" onClick={downloadJpeg} disabled={!qr}
-        className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black text-sm cursor-pointer">
+        className="w-full py-3 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-black text-sm cursor-pointer">
         Download Ticket (JPEG)
       </button>
       <button type="button" onClick={() => window.print()} className="w-full py-2.5 rounded-xl border border-slate-300 bg-white text-slate-700 font-bold text-xs cursor-pointer">Print Instead</button>

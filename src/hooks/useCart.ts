@@ -8,14 +8,14 @@
  */
 
 import { useState, useCallback, useEffect } from "react";
-import type { MenuItem, CartLine } from "@/types";
+import type { MenuItem, CartLine, ModifierOption } from "@/types";
 
 export interface UseCartReturn {
   cart: Record<string, CartLine>;
   cartLines: CartLine[];
   totalQty: number;
   totalPaise: number;
-  addItem: (item: MenuItem, options?: { spiceLevel?: string; sizeVariant?: string; notes?: string }) => void;
+  addItem: (item: MenuItem, options?: { selectedModifiers?: import("@/types").ModifierOption[]; notes?: string }) => void;
   removeItem: (itemId: string) => void;
   increaseQty: (itemId: string) => void;
   decreaseQty: (itemId: string) => void;
@@ -46,7 +46,7 @@ export function useCart(storageKey: string): UseCartReturn {
   const addItem = useCallback(
     (
       item: MenuItem,
-      options?: { spiceLevel?: string; sizeVariant?: string; notes?: string },
+      options?: { selectedModifiers?: ModifierOption[]; notes?: string },
     ) => {
       setCart((prev) => {
         const existing = prev[item.id];
@@ -56,8 +56,7 @@ export function useCart(storageKey: string): UseCartReturn {
             item,
             quantity: (existing?.quantity ?? 0) + 1,
             notes: options?.notes ?? existing?.notes ?? "",
-            spiceLevel: options?.spiceLevel ?? existing?.spiceLevel,
-            sizeVariant: options?.sizeVariant ?? existing?.sizeVariant,
+            selectedModifiers: options?.selectedModifiers ?? existing?.selectedModifiers ?? [],
           },
         };
       });
@@ -113,7 +112,10 @@ export function useCart(storageKey: string): UseCartReturn {
   const cartLines = Object.values(cart);
   const totalQty = cartLines.reduce((sum, l) => sum + l.quantity, 0);
   const totalPaise = cartLines.reduce(
-    (sum, l) => sum + l.item.price_paise * l.quantity,
+    (sum, l) => {
+      const addons = (l.selectedModifiers || []).reduce((a, m) => a + m.price_delta_paise, 0);
+      return sum + (l.item.price_paise + addons) * l.quantity;
+    },
     0,
   );
 

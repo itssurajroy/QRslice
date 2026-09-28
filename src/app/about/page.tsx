@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 selection:bg-indigo-600 selection:text-white">
+    <div className="flex min-h-screen flex-col bg-slate-50 selection:bg-brand selection:text-white">
       <Navbar />
 
       <main className="flex-1">
@@ -53,14 +53,14 @@ export default function AboutPage() {
               <li><strong>Guest Experience First:</strong> We don't force your customers to download an app. A simple scan of a physical QR code drops them right into your beautiful, customized digital menu.</li>
             </ul>
 
-            <div className="mt-12 rounded-2xl bg-indigo-50 p-8 text-center border border-indigo-100">
+            <div className="mt-12 rounded-2xl bg-brand-lavender p-8 text-center border border-indigo-100">
               <h3 className="text-xl font-bold text-indigo-900 mt-0">Ready to transform your venue?</h3>
-              <p className="text-indigo-700 mt-2 mb-6">
+              <p className="text-brand-dark mt-2 mb-6">
                 Join the growing network of independent operators upgrading their hospitality experience.
               </p>
               <Link
                 href="/onboarding"
-                className="inline-block rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 active:scale-95"
+                className="inline-block rounded-xl bg-brand px-6 py-3 font-semibold text-white shadow-sm transition-all hover:bg-brand-dark active:scale-95"
               >
                 Start Your Free Trial
               </Link>

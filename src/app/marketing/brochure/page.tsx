@@ -20,7 +20,7 @@ export default function Brochure() {
         
         <div className="px-16 pt-24 text-white relative z-10">
           <div className="flex items-center gap-4 mb-16">
-            <div className="w-14 h-14 rounded-2xl bg-white text-indigo-700 flex items-center justify-center font-black text-2xl shadow-2xl">
+            <div className="w-14 h-14 rounded-2xl bg-white text-brand-dark flex items-center justify-center font-black text-2xl shadow-2xl">
               QR
             </div>
             <span className="font-black text-4xl tracking-tight">QRslice</span>
@@ -62,21 +62,21 @@ export default function Brochure() {
             </div>
             <div className="w-1/2 space-y-8">
               <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 text-xl">🚀</div>
+                <div className="w-12 h-12 rounded-full bg-brand-lavender text-brand flex items-center justify-center shrink-0 text-xl">🚀</div>
                 <div>
                   <h4 className="font-bold text-xl mb-1 text-slate-900">No App Required</h4>
                   <p className="text-slate-500 text-sm">Frictionless ordering through the native phone browser.</p>
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 text-xl">💳</div>
+                <div className="w-12 h-12 rounded-full bg-brand-lavender text-brand flex items-center justify-center shrink-0 text-xl">💳</div>
                 <div>
                   <h4 className="font-bold text-xl mb-1 text-slate-900">Instant Payments</h4>
                   <p className="text-slate-500 text-sm">Integrate with Stripe, Apple Pay, and Google Pay to turn tables faster.</p>
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-12 h-12 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 text-xl">🔄</div>
+                <div className="w-12 h-12 rounded-full bg-brand-lavender text-brand flex items-center justify-center shrink-0 text-xl">🔄</div>
                 <div>
                   <h4 className="font-bold text-xl mb-1 text-slate-900">Live Updates</h4>
                   <p className="text-slate-500 text-sm">Customers see the status of their order updating in real-time as the kitchen cooks it.</p>
@@ -124,9 +124,9 @@ export default function Brochure() {
       {/* PAGE 4: BACK COVER */}
       <div className="w-[210mm] h-[297mm] bg-white relative overflow-hidden flex flex-col items-center justify-center text-center">
         <div className="absolute inset-0 bg-gradient-to-tr from-slate-50 to-white -z-10" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-50 rounded-full blur-[100px] -z-10 opacity-70" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-lavender rounded-full blur-[100px] -z-10 opacity-70" />
         
-        <div className="w-24 h-24 rounded-3xl bg-indigo-600 text-white flex items-center justify-center font-black text-4xl shadow-xl shadow-indigo-600/20 mb-8 mx-auto">
+        <div className="w-24 h-24 rounded-3xl bg-brand text-white flex items-center justify-center font-black text-4xl shadow-xl shadow-brand/20 mb-8 mx-auto">
           QR
         </div>
         <h2 className="text-4xl font-black text-slate-900 mb-4">Ready to upgrade?</h2>

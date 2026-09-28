@@ -151,7 +151,7 @@ export default function SuperBulkExtend({ rows }: { rows: SubRow[] }) {
                     type="button"
                     disabled={rowBusy === r.id}
                     onClick={() => handleExtend(r.id)}
-                    className="px-2.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold text-xs cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-xl bg-brand hover:bg-brand-dark disabled:opacity-50 text-white font-bold text-xs cursor-pointer"
                   >
                     {rowBusy === r.id ? "…" : "Extend +14"}
                   </button>

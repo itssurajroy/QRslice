@@ -9,7 +9,7 @@ type Row = {
 };
 
 const STATUS_STYLE: Record<string, string> = {
-  confirmed: "bg-indigo-50 border-indigo-200 text-indigo-700",
+  confirmed: "bg-brand-lavender border-brand-lavender text-brand-dark",
   pending: "bg-amber-50 border-amber-300 text-amber-800",
   seated: "bg-emerald-50 border-emerald-200 text-emerald-700",
   cancelled: "bg-slate-100 border-slate-200 text-slate-500",
@@ -64,7 +64,7 @@ export function ReservationsTab() {
         <button type="button" onClick={load} className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 cursor-pointer">🔄 Refresh</button>
       </div>
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="🔍 Search name, phone, or code…"
-        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-indigo-500" />
+        className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand" />
       {pending.length > 0 && (
         <div className="space-y-2">
           <h3 className="text-xs font-black uppercase tracking-widest text-amber-700">⏳ Pending approval ({pending.length})</h3>

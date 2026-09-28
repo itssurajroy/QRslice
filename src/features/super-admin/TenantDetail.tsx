@@ -449,7 +449,7 @@ export function TenantDetail({
                                   : order.status === "preparing"
                                   ? "bg-amber-100 text-amber-800"
                                   : order.status === "served"
-                                  ? "bg-indigo-100 text-indigo-700"
+                                  ? "bg-brand-lavender text-brand-dark"
                                   : "bg-slate-100 text-slate-600"
                               }`}
                             >
@@ -500,7 +500,7 @@ export function TenantDetail({
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold px-3 py-1 rounded-lg bg-indigo-50 text-[#5738F5] border border-indigo-100">
+                  <span className="text-xs font-semibold px-3 py-1 rounded-lg bg-brand-lavender text-[#5738F5] border border-indigo-100">
                     Tier: {tenant.tier || "growth"}
                   </span>
                   <span className="text-xs font-semibold px-3 py-1 rounded-lg bg-slate-100 text-slate-700">
@@ -719,7 +719,7 @@ export function TenantDetail({
                             <span
                               className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                                 member.role === "owner"
-                                  ? "bg-indigo-100 text-indigo-700"
+                                  ? "bg-brand-lavender text-brand-dark"
                                   : member.role === "manager"
                                   ? "bg-violet-100 text-violet-700"
                                   : member.role === "chef"

@@ -89,7 +89,7 @@ export function StatusBadge({
         label = "AVAILABLE";
         break;
       case "occupied":
-        badgeStyle = "bg-indigo-50 text-indigo-700 border-indigo-200";
+        badgeStyle = "bg-brand-lavender text-brand-dark border-indigo-200";
         label = "OCCUPIED";
         break;
       case "ordering":

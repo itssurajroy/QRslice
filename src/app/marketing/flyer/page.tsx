@@ -19,13 +19,13 @@ export default function Flyer() {
       {/* Header */}
       <div className="px-12 pt-16 pb-8 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black text-xl shadow-lg shadow-indigo-600/30">
+          <div className="w-10 h-10 rounded-xl bg-brand text-white flex items-center justify-center font-black text-xl shadow-lg shadow-brand/30">
             QR
           </div>
           <span className="font-black text-3xl tracking-tight text-slate-900">QRslice</span>
         </div>
         <div className="text-right">
-          <p className="text-xs font-bold uppercase tracking-widest text-indigo-600">Next-Gen Restaurant OS</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-brand">Next-Gen Restaurant OS</p>
         </div>
       </div>
 
@@ -75,7 +75,7 @@ export default function Flyer() {
 
       {/* Footer / CTA */}
       <div className="mt-auto bg-slate-900 text-white p-12 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full blur-[80px] opacity-30 -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-brand-lavender0 rounded-full blur-[80px] opacity-30 -translate-y-1/2 translate-x-1/2" />
         
         <div className="flex items-center justify-between relative z-10">
           <div>
